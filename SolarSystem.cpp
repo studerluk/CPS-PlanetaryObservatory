@@ -1,8 +1,6 @@
 #include "SolarSystem.h"
 #include "Planet.h"
 
-#include <fstream>
-
 using namespace std;
 
 
@@ -11,9 +9,9 @@ SolarSystem::SolarSystem() {
 	// struct Planet *earth = init_planet("earth", "149597870000.0", "0", "0", "29780.0", "5972190000000000000000000.0", "6371000");
 	// struct Planet *mars = init_planet("mars", "227939100000.0", "0", "0", "24077.0", "641693000000000000000000.0", "6792000");
 
-	Planet *sun = new Planet("sun\0", "0", "0", "0", "0", "1000000", "10");
-	Planet *earth = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "2");
-	Planet *mars = new Planet("mars\0", "100", "0", "0", "20", "10000", "4");
+	Planet *sun = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100");
+	Planet *earth = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20");
+	Planet *mars = new Planet("mars\0", "100", "0", "0", "20", "10000", "40");
 
 	this->G_CONST = "0.0001";
 
@@ -81,33 +79,16 @@ void SolarSystem::calcGravity(Planet *planet) {
 	}
 }
 
-void SolarSystem::tick(int ticks) {
-
-	int planetc = this->planetc;
-	planetc--;	// Note: I'm shifting 'planetc' by one for the 'for' loops below
-
-	int i;
+void SolarSystem::tick() {
 	Planet *planet;
 
-	ofstream file;
-	file.open("./output");
-
-	for (ticks; ticks >= 0; ticks--) {
-		i = planetc;
-		for (i; i >= 0; i--) {
-			planet = this->planets[i];
-			this->calcGravity(planet);
-		}
-
-		i = planetc;
-		for (i; i >= 0; i--) {
-			planet = this->planets[i];
-			this->movePlanet(planet);
-
-			file << planet->name << ": ";
-			file << planet->pos->x.get_d() << "|" << planet->pos->y.get_d();
-			file << "\n";
-		}
+	for (int i = 0; i < this->planetc; i++) {
+		planet = this->planets[i];
+		this->calcGravity(planet);
 	}
-	file.close();
+
+	for (int i = 0; i < this->planetc; i++) {
+		planet = this->planets[i];
+		this->movePlanet(planet);
+	}
 }

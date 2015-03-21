@@ -8,8 +8,8 @@
 using namespace std;
 
 int main_2 () {
-	SolarSystem milky = SolarSystem();
-	milky.tick(10000);
+	// SolarSystem milky = SolarSystem();
+	// milky.tick(10000);
 
 	return 0;
 }

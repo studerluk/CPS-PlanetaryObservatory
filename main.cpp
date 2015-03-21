@@ -1,10 +1,21 @@
-#include "qtview.h"
+
 #include <QApplication>
+#include <QMessageBox>
+
+#include "qtview.h"
+#include "qtviewctl.h"
+
+using namespace std;
+
 
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
 
-	QtView *gui = new QtView();
+	SolarSystem *milky = new SolarSystem();
+
+	QtView *gui = new QtView(milky);
+	QtViewCtl *ctl = new QtViewCtl(milky, gui);
+
 	gui->show();
 
 	return a.exec();
