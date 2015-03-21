@@ -1,6 +1,7 @@
 #ifndef SOLARSYSTEM_H
 #define SOLARSYSTEM_H
 
+#define MAX_PLANETS 10
 
 #include <gmp.h>
 #include <gmpxx.h>
@@ -22,7 +23,7 @@ public:
 	virtual ~SolarSystem();
 
 	void tick();
-	Planet *planets[10];
+	Planet *planets[MAX_PLANETS];
 
 private:
 	mpf_class G_CONST;

@@ -1,6 +1,9 @@
 #ifndef QTVIEW_H
 #define QTVIEW_H
 
+#define MAX_PLANETS 10
+#define ANIM_SPEED 0.9
+
 #include <QMainWindow>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsScene>
@@ -36,14 +39,18 @@ public:
 	QtView(SolarSystem*);
 	~QtView();
 
-	void movePlanets();
+	void simulate(int);
 
 
 private:
 	SolarSystem *solarSystem;
-	QGraphicsEllipseItem *ellipse[10];
+	QGraphicsEllipseItem *ellipse[MAX_PLANETS];
+
+	QTimeLine *timer;
+	QGraphicsItemAnimation *anims[MAX_PLANETS];
 
 	void initPlanets();
+	void initAnimation();
 };
 
 #endif // QTVIEW_H

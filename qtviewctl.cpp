@@ -26,10 +26,7 @@ void QtViewCtl::run() {
 									   tr("Ticks:"), 10000, 1, 100000, 0, &ok);
 
 	if (ok) {
-		for (i; i >= 0; i--) {
-			this->solarSystem->tick();
-			this->gui->movePlanets();
-		}
+		this->gui->simulate(i);
 	}
 }
 
