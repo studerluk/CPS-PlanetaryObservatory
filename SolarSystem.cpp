@@ -80,15 +80,9 @@ void SolarSystem::calcGravity(Planet *planet) {
 }
 
 void SolarSystem::tick() {
-	Planet *planet;
+	for (int i = 0; i < this->planetc; i++)
+		this->calcGravity(this->planets[i]);
 
-	for (int i = 0; i < this->planetc; i++) {
-		planet = this->planets[i];
-		this->calcGravity(planet);
-	}
-
-	for (int i = 0; i < this->planetc; i++) {
-		planet = this->planets[i];
-		this->movePlanet(planet);
-	}
+	for (int i = 0; i < this->planetc; i++)
+		this->movePlanet(this->planets[i]);
 }

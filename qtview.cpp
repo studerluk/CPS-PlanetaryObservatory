@@ -9,10 +9,12 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 	// graphics
 	scene = new QGraphicsScene(-100, -100, 1000, 800);
-	scene->setBackgroundBrush(Qt::black);
+	scene->setBackgroundBrush(Qt::white);
 
 	QGraphicsView *graph = new QGraphicsView(scene);
 	graph->setRenderHints( QPainter::Antialiasing );
+	graph->setDragMode(QGraphicsView::ScrollHandDrag);
+	graph->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 
 
 	// control buttons
@@ -52,10 +54,18 @@ QtView::~QtView() {
 void QtView::initPlanets() {
 	SolarSystem *solSys = this->solarSystem;
 	for (int i = 0; i < solSys->planetc; i++) {
+		double size = solSys->planets[i]->size.get_d();
+		double posx = solSys->planets[i]->pos->x.get_d();
+		double posy = solSys->planets[i]->pos->y.get_d();
+
 		this->ellipse[i] = this->scene->addEllipse(
-			QRectF(0, 0, solSys->planets[i]->size.get_d(), solSys->planets[i]->size.get_d()),
+			QRectF(posx, posy, size, size),
 			QPen(Qt::SolidLine), QBrush(Qt::red));
 	}
+
+	QGraphicsEllipseItem *test = this->scene->addEllipse(
+			QRectF(0, 0, 2, 2),
+			QPen(Qt::SolidLine), QBrush(Qt::black));
 }
 
 void QtView::initAnimation() {
@@ -74,17 +84,26 @@ void QtView::simulate(int count) {
 	SolarSystem *solSys = this->solarSystem;
 	int planetc = this->solarSystem->planetc;
 
-	this->timer->setDuration(count * 10);
-	timer->setFrameRange(0, count * 10);
-
-	for (int i = 0; i < count; ++i) {
-		solSys->tick();
-		for (int j = 0; j < planetc; j++) {
-			this->anims[j]->setPosAt(ANIM_SPEED,
-				QPointF(solSys->planets[j]->pos->x.get_d(),
-				solSys->planets[j]->pos->y.get_d()));
-		}
+	if (count *100 < 1000) {
+		this->timer->setDuration(1000);
+		timer->setFrameRange(0, 1000);
+	} else {
+		this->timer->setDuration(count *100);
+		timer->setFrameRange(0, count *100);
 	}
 
+	for (int i = 0; i < count; i++) {
+		solSys->tick();
+		for (int j = 0; j < planetc; j++) {
+			double size = solSys->planets[j]->size.get_d();
+			double posx = solSys->planets[j]->pos->x.get_d();
+			double posy = solSys->planets[j]->pos->y.get_d();
+
+			double step = (double) i / count;
+			this->anims[j]->setPosAt(step, QPointF(posx, posy));
+
+			// cout << solSys->planets[j]->name << ": " << solSys->planets[j]->pos->x.get_d() << "|" << solSys->planets[j]->pos->y.get_d() << "\n";
+		}
+	}
 	timer->start();
 }

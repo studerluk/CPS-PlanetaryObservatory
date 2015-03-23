@@ -18,6 +18,7 @@
 #include <QPropertyAnimation>
 #include <QTimeLine>
 #include <QGraphicsItemAnimation>
+#include <iostream>
 
 #include "SolarSystem.h"
 
