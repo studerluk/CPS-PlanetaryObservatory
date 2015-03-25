@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#include "Coords.h"
+#include "Vector.h"
 
 
 using namespace std;
@@ -16,15 +16,20 @@ using namespace std;
 class Planet {
 
 public:
-	Planet(string name, string posX, string posY, string volX, string volY,
-			 string mass, string size);
-	virtual ~Planet();
+	Planet();
+	Planet(string, Vector, Vector, string, string);
+	~Planet();
 
-	Coords *pos;
-	Coords *dof;
+	string name;
 	mpf_class mass;
 	mpf_class size;
-	string name;
+
+	Vector startPos;
+	Vector startDof;
+
+	Vector pos;
+	Vector dof;
+	
 };
 
 

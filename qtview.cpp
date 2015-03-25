@@ -5,7 +5,7 @@ using namespace std;
 
 
 QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
-	this->solarSystem = solarSystem;
+	model = solarSystem;
 
 	// graphics
 	scene = new QGraphicsScene(-100, -100, 1000, 800);
@@ -52,58 +52,74 @@ QtView::~QtView() {
 
 // planets are not centered...
 void QtView::initPlanets() {
-	SolarSystem *solSys = this->solarSystem;
-	for (int i = 0; i < solSys->planetc; i++) {
-		double size = solSys->planets[i]->size.get_d();
-		double posx = solSys->planets[i]->pos->x.get_d();
-		double posy = solSys->planets[i]->pos->y.get_d();
+	for (int i = 0; i < model->getPlanetc(); i++) {
+		double size = model->getPlanet(i)->size.get_d();
+		double posx = model->getPlanet(i)->pos.x.get_d();
+		double posy = model->getPlanet(i)->pos.y.get_d();
 
-		this->ellipse[i] = this->scene->addEllipse(
-			QRectF(posx, posy, size, size),
+		ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
 			QPen(Qt::SolidLine), QBrush(Qt::red));
 	}
 
-	QGraphicsEllipseItem *test = this->scene->addEllipse(
+	QGraphicsEllipseItem *test = scene->addEllipse(
 			QRectF(0, 0, 2, 2),
 			QPen(Qt::SolidLine), QBrush(Qt::black));
 }
 
 void QtView::initAnimation() {
-	int planetc = this->solarSystem->planetc;
+	timer = new QTimeLine();
 
-	this->timer = new QTimeLine();
-
-	for (int i = 0; i < planetc; i++) {
-		this->anims[i] = new QGraphicsItemAnimation();
-		this->anims[i]->setItem(this->ellipse[i]);
-		this->anims[i]->setTimeLine(this->timer);
+	for (int i = 0; i < model->getPlanetc(); i++) {
+		anims[i] = new QGraphicsItemAnimation();
+		anims[i]->setItem(ellipse[i]);
+		anims[i]->setTimeLine(timer);
 	}
 }
 
 void QtView::simulate(int count) {
-	SolarSystem *solSys = this->solarSystem;
-	int planetc = this->solarSystem->planetc;
+	this->holdButtons();
 
 	if (count *100 < 1000) {
-		this->timer->setDuration(1000);
+		timer->setDuration(1000);
 		timer->setFrameRange(0, 1000);
 	} else {
-		this->timer->setDuration(count *100);
+		timer->setDuration(count *100);
 		timer->setFrameRange(0, count *100);
 	}
 
 	for (int i = 0; i < count; i++) {
-		solSys->tick();
-		for (int j = 0; j < planetc; j++) {
-			double size = solSys->planets[j]->size.get_d();
-			double posx = solSys->planets[j]->pos->x.get_d();
-			double posy = solSys->planets[j]->pos->y.get_d();
+		model->tick();
+		for (int j = 0; j < model->getPlanetc(); j++) {
+			double size = model->getPlanet(j)->size.get_d();
+			double posx = model->getPlanet(j)->pos.x.get_d();
+			double posy = model->getPlanet(j)->pos.y.get_d();
 
 			double step = (double) i / count;
-			this->anims[j]->setPosAt(step, QPointF(posx, posy));
+			anims[j]->setPosAt(step, QPointF(posx, posy));
 
 			// cout << solSys->planets[j]->name << ": " << solSys->planets[j]->pos->x.get_d() << "|" << solSys->planets[j]->pos->y.get_d() << "\n";
 		}
 	}
 	timer->start();
+}
+
+void QtView::updateView() {
+	for (int i = 0; i < model->getPlanetc(); i++) {
+		double posx = model->getPlanet(i)->pos.x.get_d();
+		double posy = model->getPlanet(i)->pos.y.get_d();
+
+		ellipse[i]->setPos(QPointF(posx, posy));
+	}
+}
+
+void QtView::holdButtons() {
+	qBtnAdd->setEnabled(false);
+	qBtnEdit->setEnabled(false);
+	qBtnDelete->setEnabled(false);
+	qBtnReset->setEnabled(false);
+	qBtnRun->setEnabled(false);
+}
+
+void QtView::releaseButtons() {
+
 }

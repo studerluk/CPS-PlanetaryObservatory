@@ -16,6 +16,7 @@
 #include <QInputDialog>
 #include <QString>
 
+#include "Planet.h"
 #include "SolarSystem.h"
 #include "qtview.h"
 
@@ -31,15 +32,18 @@ public:
     ~QtViewCtl();
 
 private:
-    SolarSystem *solarSystem;
-    QtView *gui;
+    SolarSystem *model;
+    QtView *view;
 
 public slots:
-	void run();
-    void displayError();
+	void displayError();
 
-// 	void changeQry(QString);
-// 	void updateQry();
+	void run();
+	void reset();
+	void addPlanet();
+	void editPlanet();
+	void delPlanet();
+	void enableBtns();
 
 };
 

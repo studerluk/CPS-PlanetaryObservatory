@@ -15,14 +15,14 @@ LIBS += -lgmp -lgmpxx
 
 SOURCES += main.cpp\
 		qtview.cpp \
-	Coords.cpp \
 	main_2.cpp \
 	Planet.cpp \
 	SolarSystem.cpp \
-    qtviewctl.cpp
+    qtviewctl.cpp \
+    Vector.cpp
 
 HEADERS  += qtview.h \
-	Coords.h \
 	Planet.h \
 	SolarSystem.h \
-    qtviewctl.h
+    qtviewctl.h \
+    Vector.h

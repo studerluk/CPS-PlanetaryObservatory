@@ -1,17 +1,24 @@
-#include "Coords.h"
+
 #include "Planet.h"
 
 using namespace std;
 
 
-Planet::Planet(string name, string posX, string posY, string volX, string volY,
-				 string mass, string size) {
+Planet::Planet() {
+	
+}
+
+Planet::Planet(string name, Vector pos, Vector dof, string mass, string size) {
 
 	this->name = name;
+	this->pos = pos;
+	this->dof = dof;
+
 	this->size = mpf_class(size, 512);
 	this->mass = mpf_class(mass, 512);
-	this->pos = new Coords(posX, posY);
-	this->dof = new Coords(volX, volY);
+
+	this->startPos = pos;
+	this->startDof = dof;
 
 	cout << this->name << " initialized\n";
 }

@@ -3,6 +3,9 @@
 
 #define MAX_PLANETS 10
 
+#include <QtGui>
+#include <QWidget>
+
 #include <gmp.h>
 #include <gmpxx.h>
 #include <iostream>
@@ -14,39 +17,30 @@
 using namespace std;
 
 
-class SolarSystem {
+class SolarSystem : public QWidget {
+
+	Q_OBJECT
 
 public:
-	int planetc;
-	
 	SolarSystem();
-	virtual ~SolarSystem();
+	~SolarSystem();
+
+	mpf_class getG();
+
+	int getPlanetc();
+	Planet* getPlanet(int);
 
 	void tick();
-	Planet *planets[MAX_PLANETS];
-
+	void resetPlanets();
+	bool addPlanet(string, Vector, Vector, string, string);
+	
 private:
 	mpf_class G_CONST;
 
-	void movePlanet(Planet*);
+	int planetc;
+	Planet planets[MAX_PLANETS];
+	
 	void calcGravity(Planet*);
-
-// public slots:
-// 	void search(QString, QString);
-// 	void errHandling(int);
-
-// signals:
-// 	void queryChanged();
-// 	void searchDone();
-// 	void indexChanged();
-// 	void idChanged();
-// 	void selectionChanged();
-// 	void mgntSelChanged();
-// 	void wordlistChanged();
-// 	void mgntViewOpened();
-// 	void catChanged();
-// 	void headChanged();
-// 	void errorOccurred(QString);
 
 };
 

@@ -31,6 +31,8 @@ class QtView : public QMainWindow
 
 public:
 	QGraphicsScene *scene;
+	QTimeLine *timer;
+
 	QPushButton *qBtnAdd;
 	QPushButton *qBtnEdit;
 	QPushButton *qBtnDelete;
@@ -41,17 +43,19 @@ public:
 	~QtView();
 
 	void simulate(int);
+	void updateView();
 
 
 private:
-	SolarSystem *solarSystem;
+	SolarSystem *model;
+	
 	QGraphicsEllipseItem *ellipse[MAX_PLANETS];
-
-	QTimeLine *timer;
 	QGraphicsItemAnimation *anims[MAX_PLANETS];
 
 	void initPlanets();
 	void initAnimation();
+	void holdButtons();
+	void releaseButtons();
 };
 
 #endif // QTVIEW_H

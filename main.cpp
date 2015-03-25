@@ -5,6 +5,8 @@
 #include "qtview.h"
 #include "qtviewctl.h"
 
+#include "SolarSystem.h"
+
 using namespace std;
 
 
