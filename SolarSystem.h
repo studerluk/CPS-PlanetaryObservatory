@@ -6,6 +6,7 @@
 #include <QtGui>
 #include <QWidget>
 
+
 #include <gmp.h>
 #include <gmpxx.h>
 #include <iostream>
@@ -31,16 +32,24 @@ public:
 	Planet* getPlanet(int);
 
 	void tick();
-	void resetPlanets();
-	bool addPlanet(string, Vector, Vector, string, string);
+	void addPlanet(string, Vector, Vector, string, string);
 	
 private:
 	mpf_class G_CONST;
 
 	int planetc;
-	Planet planets[MAX_PLANETS];
+	Planet *planets[MAX_PLANETS];
 	
 	void calcGravity(Planet*);
+
+public slots:
+	void resetPlanets();
+
+signals:
+	void errorOccured(QString);
+
+	void planetsMoved();
+	void planetAdded();
 
 };
 

@@ -36,14 +36,12 @@ private:
     QtView *view;
 
 public slots:
-	void displayError();
+	void displayError(QString);
 
 	void run();
-	void reset();
 	void addPlanet();
 	void editPlanet();
 	void delPlanet();
-	void enableBtns();
 
 };
 

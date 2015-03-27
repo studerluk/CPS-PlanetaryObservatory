@@ -1,9 +1,6 @@
 #ifndef QTVIEW_H
 #define QTVIEW_H
 
-#define MAX_PLANETS 10
-#define ANIM_SPEED 0.9
-
 #include <QMainWindow>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsScene>
@@ -18,7 +15,10 @@
 #include <QPropertyAnimation>
 #include <QTimeLine>
 #include <QGraphicsItemAnimation>
+#include <QMessageBox>
+
 #include <iostream>
+#include <string.h>
 
 #include "SolarSystem.h"
 
@@ -43,8 +43,6 @@ public:
 	~QtView();
 
 	void simulate(int);
-	void updateView();
-
 
 private:
 	SolarSystem *model;
@@ -54,8 +52,18 @@ private:
 
 	void initPlanets();
 	void initAnimation();
+	
+public slots:
+	void addEllipse();
+
+	void updateView();
+
 	void holdButtons();
 	void releaseButtons();
+
+signals:
+	void errorOccured(QString);
+
 };
 
 #endif // QTVIEW_H

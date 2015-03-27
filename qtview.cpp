@@ -50,7 +50,6 @@ QtView::~QtView() {
 
 }
 
-// planets are not centered...
 void QtView::initPlanets() {
 	for (int i = 0; i < model->getPlanetc(); i++) {
 		double size = model->getPlanet(i)->size.get_d();
@@ -103,7 +102,25 @@ void QtView::simulate(int count) {
 	timer->start();
 }
 
+void QtView::addEllipse() {
+	int i = model->getPlanetc() -1;
+
+	double size = model->getPlanet(i)->size.get_d();
+	double posx = model->getPlanet(i)->pos.x.get_d();
+	double posy = model->getPlanet(i)->pos.y.get_d();
+
+	ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
+			QPen(Qt::SolidLine), QBrush(Qt::red));
+
+	anims[i] = new QGraphicsItemAnimation();
+	anims[i]->setItem(ellipse[i]);
+	anims[i]->setTimeLine(timer);
+
+	this->updateView();
+}
+
 void QtView::updateView() {
+
 	for (int i = 0; i < model->getPlanetc(); i++) {
 		double posx = model->getPlanet(i)->pos.x.get_d();
 		double posy = model->getPlanet(i)->pos.y.get_d();
@@ -121,5 +138,9 @@ void QtView::holdButtons() {
 }
 
 void QtView::releaseButtons() {
-
+	qBtnAdd->setEnabled(true);
+	qBtnEdit->setEnabled(true);
+	qBtnDelete->setEnabled(true);
+	qBtnReset->setEnabled(true);
+	qBtnRun->setEnabled(true);
 }
