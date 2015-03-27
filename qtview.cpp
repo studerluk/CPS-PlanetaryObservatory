@@ -24,7 +24,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 	qBtnReset = new QPushButton("Reset");
 	qBtnRun = new QPushButton("Run");
 
-	QHBoxLayout *lout_btns = new QHBoxLayout(); // Layout
+	QVBoxLayout *lout_btns = new QVBoxLayout(); // Layout
 	lout_btns->addWidget(qBtnAdd);
 	lout_btns->addWidget(qBtnEdit);
 	lout_btns->addWidget(qBtnDelete);
@@ -33,14 +33,20 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 
 	// building window
-	QVBoxLayout *lout_main = new QVBoxLayout();
-	lout_main->addWidget(graph);
-	lout_main->addLayout(lout_btns);
+	QDockWidget *dock = new QDockWidget("Controlls", this);
+	dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+	dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	dock->setWidget(new QWidget());
+	dock->widget()->setLayout(lout_btns);
 
-	QWidget *widget = new QWidget();
-	widget->setLayout(lout_main);
+	this->addDockWidget(Qt::RightDockWidgetArea, dock);
+	this->setCentralWidget(graph);
 
-	this->setCentralWidget(widget);
+	progBar = new QProgressBar(this);
+	progBar->setMinimum(0);
+	progBar->setMaximum(1);
+	progBar->setValue(0);
+	lout_btns->addWidget(progBar);
 
 	this->initPlanets();
 	this->initAnimation();
@@ -76,15 +82,16 @@ void QtView::initAnimation() {
 }
 
 void QtView::simulate(int count) {
-	this->holdButtons();
+	model->setBtnState(false);
 
-	if (count *100 < 1000) {
-		timer->setDuration(1000);
-		timer->setFrameRange(0, 1000);
-	} else {
-		timer->setDuration(count *100);
-		timer->setFrameRange(0, count *100);
-	}
+	int duration = 1000;
+	if (count *100 > 1000)
+		duration = count *100;
+
+	timer->setDuration(duration);
+	timer->setFrameRange(0, duration);
+
+	model->resetProgBar(duration);
 
 	for (int i = 0; i < count; i++) {
 		model->tick();
@@ -95,8 +102,6 @@ void QtView::simulate(int count) {
 
 			double step = (double) i / count;
 			anims[j]->setPosAt(step, QPointF(posx, posy));
-
-			// cout << solSys->planets[j]->name << ": " << solSys->planets[j]->pos->x.get_d() << "|" << solSys->planets[j]->pos->y.get_d() << "\n";
 		}
 	}
 	timer->start();
@@ -120,7 +125,6 @@ void QtView::addEllipse() {
 }
 
 void QtView::updateView() {
-
 	for (int i = 0; i < model->getPlanetc(); i++) {
 		double posx = model->getPlanet(i)->pos.x.get_d();
 		double posy = model->getPlanet(i)->pos.y.get_d();
@@ -129,18 +133,23 @@ void QtView::updateView() {
 	}
 }
 
-void QtView::holdButtons() {
-	qBtnAdd->setEnabled(false);
-	qBtnEdit->setEnabled(false);
-	qBtnDelete->setEnabled(false);
-	qBtnReset->setEnabled(false);
-	qBtnRun->setEnabled(false);
+void QtView::updateBtns() {
+	bool state = model->getBtnState();
+
+	qBtnAdd->setEnabled(state);
+	qBtnEdit->setEnabled(state);
+	qBtnDelete->setEnabled(state);
+	qBtnReset->setEnabled(state);
+	qBtnRun->setEnabled(state);
 }
 
-void QtView::releaseButtons() {
-	qBtnAdd->setEnabled(true);
-	qBtnEdit->setEnabled(true);
-	qBtnDelete->setEnabled(true);
-	qBtnReset->setEnabled(true);
-	qBtnRun->setEnabled(true);
+void QtView::updateProgBar() {
+	int frameCount = model->getFrameCount();
+	int progBarValue = model->getProgBarValue();
+
+	if (progBar->maximum() != frameCount)
+		progBar->setMaximum(model->getFrameCount());
+
+	if (progBar->value() != progBarValue)
+		progBar->setValue(model->getProgBarValue());
 }

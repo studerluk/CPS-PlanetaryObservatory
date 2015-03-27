@@ -15,16 +15,16 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(view->qBtnRun, SIGNAL(clicked()), this, SLOT(run()));
 	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(resetPlanets()));
 	connect(view->qBtnAdd, SIGNAL(clicked()), this, SLOT(addPlanet()));
-	connect(view->timer, SIGNAL(finished()), view, SLOT(releaseButtons()));
+	connect(view->timer, SIGNAL(finished()), model, SLOT(enableBtns()));
+	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(updateProgBar(int)));
 
 	connect(model, SIGNAL(planetAdded()), view, SLOT(addEllipse()));
 	connect(model, SIGNAL(planetsMoved()), view, SLOT(updateView()));
+	connect(model, SIGNAL(progBarChanged()), view, SLOT(updateProgBar()));
+	connect(model, SIGNAL(btnStateChanged()), view, SLOT(updateBtns()));
 	
 
 	view->installEventFilter(this);
-
-	// cout << solarSystem->planets[0]->name;
-	//gui->updateView();
 }
 
 QtViewCtl::~QtViewCtl() {

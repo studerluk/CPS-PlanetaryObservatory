@@ -16,6 +16,11 @@ SolarSystem::SolarSystem() : QWidget() {
 
 	planetc = 3;
 
+	frameCount = 0;
+	progBarValue = 0;
+
+	btnsEnabled = true;
+
 	puts("SolarSystem populated\n");
 }
 
@@ -33,6 +38,41 @@ int SolarSystem::getPlanetc() {
 
 Planet* SolarSystem::getPlanet(int pos) {
 	return planets[pos];
+}
+
+void SolarSystem::enableBtns() {
+	this->setBtnState(true);
+}
+
+void SolarSystem::setBtnState(bool state) {
+	btnsEnabled = state;
+	emit btnStateChanged();
+}
+
+bool SolarSystem::getBtnState() {
+	return btnsEnabled;
+}
+
+
+int SolarSystem::getFrameCount() {
+	return frameCount;
+}
+
+int SolarSystem::getProgBarValue() {
+	return progBarValue;
+}
+
+void SolarSystem::resetProgBar(int timerDuration) {
+	frameCount = timerDuration;
+	progBarValue = 0;
+
+	emit progBarChanged();
+}
+
+void SolarSystem::updateProgBar(int frameNr) {
+	progBarValue = frameNr;
+
+	emit progBarChanged();
 }
 
 // implement adding an elipse for the created planet
@@ -112,5 +152,5 @@ void SolarSystem::tick() {
 		planets[i]->pos.y += planets[i]->dof.y;
 	}
 
-	// emit planetsMoved();
+	//emit planetsMoved();
 }

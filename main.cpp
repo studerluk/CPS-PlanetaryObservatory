@@ -18,23 +18,11 @@ int main(int argc, char *argv[]) {
 	QtView *gui = new QtView(milky);
 	QtViewCtl *ctl = new QtViewCtl(milky, gui);
 
+	// QtView *gui2 = new QtView(milky);
+	// QtViewCtl *ctl2 = new QtViewCtl(milky, gui2);
+
 	gui->show();
+	// gui2->show();
 
 	return a.exec();
 }
-
-
-/*
-QApplication a(argc, argv);
-model *m = new model();
-
-QtGuiView *gui = new QtGuiView(m);
-new QtGuiCtrl(m, gui);
-
-//QtGuiView *guib = new QtGuiView(m);
-//new QtGuiCtrl(m, guib);
-
-gui->show();
-//guib->show();
-return a.exec();
-*/

@@ -7,15 +7,15 @@
 #include <QGraphicsView>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QSplitter>
 #include <QApplication>
 #include <QtGui>
 #include <QWidget>
 #include <QPushButton>
-#include <QPropertyAnimation>
 #include <QTimeLine>
 #include <QGraphicsItemAnimation>
 #include <QMessageBox>
+#include <QDockWidget>
+#include <QProgressBar>
 
 #include <iostream>
 #include <string.h>
@@ -50,6 +50,8 @@ private:
 	QGraphicsEllipseItem *ellipse[MAX_PLANETS];
 	QGraphicsItemAnimation *anims[MAX_PLANETS];
 
+	QProgressBar *progBar;
+
 	void initPlanets();
 	void initAnimation();
 	
@@ -57,9 +59,9 @@ public slots:
 	void addEllipse();
 
 	void updateView();
+	void updateProgBar();
 
-	void holdButtons();
-	void releaseButtons();
+	void updateBtns();
 
 signals:
 	void errorOccured(QString);
