@@ -25,17 +25,17 @@ using namespace std;
 
 class QtViewCtl: public QWidget {
 
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    QtViewCtl(SolarSystem*, QtView*);
-    ~QtViewCtl();
+	QtViewCtl(SolarSystem*, QtView*);
+	~QtViewCtl();
 
 private:
-    SolarSystem *model;
-    QtView *view;
+	SolarSystem *model;
+	QtView *view;
 
-    int getSelectedPlanet();
+	Planet* extractPlanet();
 
 public slots:
 	void displayError(QString);

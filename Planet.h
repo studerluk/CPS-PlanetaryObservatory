@@ -17,7 +17,8 @@ class Planet {
 
 public:
 	Planet();
-	Planet(string, Vector, Vector, string, string);
+	Planet(string, string, string, string, string, string, string);
+	Planet(string, Vector, Vector, mpf_class, mpf_class);
 	~Planet();
 
 	string name;

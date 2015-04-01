@@ -13,9 +13,9 @@ SolarSystem::SolarSystem() : QWidget() {
 	for (int i = 0; i < MAX_PLANETS; i++)
 		planets[i] = NULL;
 
-	planets[0] = new Planet("sun\0", Vector("0", "0"), Vector("0", "0"), "1000000", "100");
-	planets[1] = new Planet("earth\0", Vector("50.0", "0"), Vector("0", "10"), "10000", "20");
-	planets[2] = new Planet("mars\0", Vector("100", "0"), Vector("0", "20"), "10000", "40");
+	planets[0] = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100");
+	planets[1] = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20");
+	planets[2] = new Planet("mars\0", "100", "0", "0", "20", "10000", "40");
 
 	G_CONST = "0.0001";
 
@@ -67,29 +67,15 @@ int SolarSystem::getProgBarValue() {
 void SolarSystem::resetProgBar(int timerDuration) {
 	frameCount = timerDuration;
 	progBarValue = 0;
-
 	emit progBarChanged();
 }
 
 void SolarSystem::updateProgBar(int frameNr) {
 	progBarValue = frameNr;
-
 	emit progBarChanged();
 }
 
-void SolarSystem::addPlanet(QString name, QString posX, QString posY, QString dofX, QString dofY, QString mass, QString size) {
-	string s_name = name.toUtf8().constData();
-	string s_posx = posX.toUtf8().constData();
-	string s_posy = posY.toUtf8().constData();
-	string s_dofx = dofX.toUtf8().constData();
-	string s_dofy = dofY.toUtf8().constData();
-	string s_mass = mass.toUtf8().constData();
-	string s_size = size.toUtf8().constData();
-
-	addPlanet(s_name, Vector(s_posx, s_posy), Vector(s_dofx, s_dofy), s_mass, s_size);
-}
-
-void SolarSystem::addPlanet(string name, Vector pos, Vector dof, string mass, string size) {
+void SolarSystem::addPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size) {
 	int id = -1;
 	for (int i = 0; i < MAX_PLANETS; i++) {
 		if (planets[i] == NULL) {
@@ -105,19 +91,7 @@ void SolarSystem::addPlanet(string name, Vector pos, Vector dof, string mass, st
 		emit errorOccured("No more room for planets...");
 }
 
-void SolarSystem::editPlanet(QString name, QString posX, QString posY, QString dofX, QString dofY, QString mass, QString size) {
-	string s_name = name.toUtf8().constData();
-	string s_posx = posX.toUtf8().constData();
-	string s_posy = posY.toUtf8().constData();
-	string s_dofx = dofX.toUtf8().constData();
-	string s_dofy = dofY.toUtf8().constData();
-	string s_mass = mass.toUtf8().constData();
-	string s_size = size.toUtf8().constData();
-
-	editPlanet(s_name, Vector(s_posx, s_posy), Vector(s_dofx, s_dofy), s_mass, s_size);
-}
-
-void SolarSystem::editPlanet(string name, Vector pos, Vector dof, string mass, string size) {
+void SolarSystem::editPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size) {
 	Planet *planet = NULL;
 
 	for (int i = 0; i < MAX_PLANETS; i++) {

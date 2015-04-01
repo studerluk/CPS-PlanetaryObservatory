@@ -42,10 +42,8 @@ public:
 	bool getCtrlState();
 
 	void tick();
-	void addPlanet(string, Vector, Vector, string, string);
-	void addPlanet(QString, QString, QString, QString, QString, QString, QString);
-	void editPlanet(string, Vector, Vector, string, string);
-	void editPlanet(QString, QString, QString, QString, QString, QString, QString);
+	void addPlanet(string, Vector, Vector, mpf_class, mpf_class);
+	void editPlanet(string, Vector, Vector, mpf_class, mpf_class);
 	void deletePlanet(int);
 
 	bool planetExists(string);

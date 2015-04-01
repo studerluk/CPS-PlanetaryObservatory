@@ -42,7 +42,7 @@ public:
 	QtView(SolarSystem*);
 	~QtView();
 
-	void simulate(int);
+	void animate(int);
 	QGraphicsEllipseItem* getEllipse(int);
 
 private:
@@ -54,19 +54,13 @@ private:
 
 	QProgressBar *progBar;
 
-	void initPlanets();
-	void initAnimation();
-	
 public slots:
 	void addEllipse(int);
 	void delEllipse(int);
 
 	void updateView();
-	void updateProgBar();
-
+	void updateAnimInfo();
 	void updateCtrls();
-
-	void updateSelection();
 
 signals:
 	void errorOccured(QString);

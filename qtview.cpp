@@ -14,7 +14,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 	scene->setBackgroundBrush(Qt::white);
 
 	graphicsView = new QGraphicsView(scene);
-	graphicsView->setRenderHints( QPainter::Antialiasing );
+	graphicsView->setRenderHints(QPainter::Antialiasing);
 	graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 	graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 
@@ -59,8 +59,9 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 	progBar = new QProgressBar(this);
 	progBar->setMinimum(0);
-	progBar->setMaximum(1);
+	progBar->setMaximum(100);
 	progBar->setValue(0);
+
 
 	// building ctrl layout
 	QGridLayout *loutCtrl = new QGridLayout();
@@ -81,6 +82,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 	loutCtrl->addWidget(progBar, 11, 0, 1, 2, Qt::AlignJustify);
 
+
 	// Misc
 	QDockWidget *dock = new QDockWidget("Controlls", this);
 	dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
@@ -91,18 +93,15 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 	addDockWidget(Qt::RightDockWidgetArea, dock);
 	setCentralWidget(graphicsView);
 
-	initPlanets();
-	initAnimation();
-}
 
-QtView::~QtView() {
+	// setup ellipse and animations
+	timer = new QTimeLine();
 
-}
-
-void QtView::initPlanets() {
-	for (int i = 0; i < MAX_PLANETS; i++)
+	for (int i = 0; i < MAX_PLANETS; i++) {
 		ellipse[i] = NULL;
-
+		anims[i] = NULL;
+	}
+		
 	for (int i = 0; i < MAX_PLANETS; i++) {
 		if (model->getPlanet(i) != NULL) {
 			double size = model->getPlanet(i)->size.get_d();
@@ -112,6 +111,10 @@ void QtView::initPlanets() {
 			ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
 				QPen(Qt::SolidLine), QBrush(Qt::red));
 			ellipse[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+			anims[i] = new QGraphicsItemAnimation();
+			anims[i]->setItem(ellipse[i]);
+			anims[i]->setTimeLine(timer);
 		}
 	}
 
@@ -120,22 +123,33 @@ void QtView::initPlanets() {
 			QPen(Qt::SolidLine), QBrush(Qt::black));
 }
 
-void QtView::initAnimation() {
-	timer = new QTimeLine();
+QtView::~QtView() {
 
-	for (int i = 0; i < MAX_PLANETS; i++)
-		anims[i] = NULL;
-
-	for (int i = 0; i < MAX_PLANETS; i++) {
-		if (model->getPlanet(i) != NULL) {
-			anims[i] = new QGraphicsItemAnimation();
-			anims[i]->setItem(ellipse[i]);
-			anims[i]->setTimeLine(timer);
-		}
-	}
 }
 
-void QtView::simulate(int count) {
+void QtView::addEllipse(int id) {
+	double size = model->getPlanet(id)->size.get_d();
+	double posx = model->getPlanet(id)->pos.x.get_d();
+	double posy = model->getPlanet(id)->pos.y.get_d();
+
+	ellipse[id] = scene->addEllipse(QRectF(posx, posy, size, size),
+			QPen(Qt::SolidLine), QBrush(Qt::red));
+	ellipse[id]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+	anims[id] = new QGraphicsItemAnimation();
+	anims[id]->setItem(ellipse[id]);
+	anims[id]->setTimeLine(timer);
+}
+
+void QtView::delEllipse(int id) {
+	delete ellipse[id];
+	ellipse[id] = NULL;
+
+	delete anims[id];
+	ellipse[id] = NULL;
+}
+
+void QtView::animate(int count) {
 	model->setCtrlState(false);
 
 	int duration = 1000;
@@ -161,30 +175,6 @@ void QtView::simulate(int count) {
 		}
 	}
 	timer->start();
-}
-
-void QtView::addEllipse(int id) {
-	double size = model->getPlanet(id)->size.get_d();
-	double posx = model->getPlanet(id)->pos.x.get_d();
-	double posy = model->getPlanet(id)->pos.y.get_d();
-
-	ellipse[id] = scene->addEllipse(QRectF(posx, posy, size, size),
-			QPen(Qt::SolidLine), QBrush(Qt::red));
-	ellipse[id]->setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-	anims[id] = new QGraphicsItemAnimation();
-	anims[id]->setItem(ellipse[id]);
-	anims[id]->setTimeLine(timer);
-
-	this->updateView();
-}
-
-void QtView::delEllipse(int id) {
-	delete ellipse[id];
-	ellipse[id] = NULL;
-
-	delete anims[id];
-	ellipse[id] = NULL;
 }
 
 void QtView::updateView() {
@@ -216,16 +206,15 @@ void QtView::updateCtrls() {
 	qTxtSize->setEnabled(state);
 }
 
-void QtView::updateProgBar() {
+void QtView::updateAnimInfo() {
 	int frameCount = model->getFrameCount();
 
 	if (progBar->maximum() != frameCount)
 		progBar->setMaximum(frameCount);
 
-	progBar->setValue(model->getProgBarValue());
-}
+	if (model->getProgBarValue() >= 0)
+		progBar->setValue(model->getProgBarValue());
 
-void QtView::updateSelection() {
 	int id = model->getSelectedPlanetID();
 	if (id >= 0) {
 		Planet *planet = model->getPlanet(id);
@@ -237,7 +226,7 @@ void QtView::updateSelection() {
 		qTxtDofY->setText(QString::number(planet->dof.y.get_d(), 'f', 3));
 		qTxtMass->setText(QString::number(planet->mass.get_d(), 'f', 3));
 		qTxtSize->setText(QString::number(planet->size.get_d(), 'f', 3));
-	}	
+	}
 }
 
 QGraphicsEllipseItem* QtView::getEllipse(int i) {
