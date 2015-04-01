@@ -8,6 +8,8 @@ SolarSystem::SolarSystem() : QWidget() {
 	// struct Planet *earth = init_planet("earth", "149597870000.0", "0", "0", "29780.0", "5972190000000000000000000.0", "6371000");
 	// struct Planet *mars = init_planet("mars", "227939100000.0", "0", "0", "24077.0", "641693000000000000000000.0", "6792000");
 
+	selectedPlanet = new Planet("Name", Vector("0", "0"), Vector("0", "0"), "0", "0");
+
 	planets[0] = new Planet("sun\0", Vector("0", "0"), Vector("0", "0"), "1000000", "100");
 	planets[1] = new Planet("earth\0", Vector("50.0", "0"), Vector("0", "10"), "10000", "20");
 	planets[2] = new Planet("mars\0", Vector("100", "0"), Vector("0", "20"), "10000", "40");
@@ -19,7 +21,7 @@ SolarSystem::SolarSystem() : QWidget() {
 	frameCount = 0;
 	progBarValue = 0;
 
-	btnsEnabled = true;
+	ctrlsEnabled = true;
 
 	puts("SolarSystem populated\n");
 }
@@ -32,6 +34,10 @@ mpf_class SolarSystem::getG() {
 	return G_CONST;
 }
 
+void SolarSystem::setG(double g) {
+	G_CONST = g;
+}
+
 int SolarSystem::getPlanetc() {
 	return planetc;
 }
@@ -40,19 +46,18 @@ Planet* SolarSystem::getPlanet(int pos) {
 	return planets[pos];
 }
 
-void SolarSystem::enableBtns() {
-	this->setBtnState(true);
+void SolarSystem::enableCtrls() {
+	this->setCtrlState(true);
 }
 
-void SolarSystem::setBtnState(bool state) {
-	btnsEnabled = state;
-	emit btnStateChanged();
+void SolarSystem::setCtrlState(bool state) {
+	ctrlsEnabled = state;
+	emit ctrlStateChanged();
 }
 
-bool SolarSystem::getBtnState() {
-	return btnsEnabled;
+bool SolarSystem::getCtrlState() {
+	return ctrlsEnabled;
 }
-
 
 int SolarSystem::getFrameCount() {
 	return frameCount;
@@ -75,10 +80,19 @@ void SolarSystem::updateProgBar(int frameNr) {
 	emit progBarChanged();
 }
 
-// implement adding an elipse for the created planet
+void SolarSystem::addPlanet(QString name, QString posX, QString posY, QString dofX, QString dofY, QString mass, QString size) {
+	string s_name = name.toUtf8().constData();
+	string s_posx = posX.toUtf8().constData();
+	string s_posy = posY.toUtf8().constData();
+	string s_dofx = dofX.toUtf8().constData();
+	string s_dofy = dofY.toUtf8().constData();
+	string s_mass = mass.toUtf8().constData();
+	string s_size = size.toUtf8().constData();
+
+	addPlanet(s_name, Vector(s_posx, s_posy), Vector(s_dofx, s_dofy), s_mass, s_size);
+}
+
 void SolarSystem::addPlanet(string name, Vector pos, Vector dof, string mass, string size) {
-	// QMessageBox::warning(this, "Error", "errMsg", QMessageBox::Ok);
-	
 	if (planetc + 1 < 10) {
 		planets[planetc] = new Planet(name, pos, dof, mass, size);
 		planetc++;
@@ -87,6 +101,41 @@ void SolarSystem::addPlanet(string name, Vector pos, Vector dof, string mass, st
 
 	} else {
 		emit errorOccured("No more room for planets...");
+	}
+}
+
+void SolarSystem::editPlanet(QString name, QString posX, QString posY, QString dofX, QString dofY, QString mass, QString size) {
+	string s_name = name.toUtf8().constData();
+	string s_posx = posX.toUtf8().constData();
+	string s_posy = posY.toUtf8().constData();
+	string s_dofx = dofX.toUtf8().constData();
+	string s_dofy = dofY.toUtf8().constData();
+	string s_mass = mass.toUtf8().constData();
+	string s_size = size.toUtf8().constData();
+
+	editPlanet(s_name, Vector(s_posx, s_posy), Vector(s_dofx, s_dofy), s_mass, s_size);
+}
+
+void SolarSystem::editPlanet(string name, Vector pos, Vector dof, string mass, string size) {
+	Planet *planet = NULL;
+
+	for (int i = 0; i < planetc; i++) {
+		if (!planets[i]->name.compare(name)) {
+			planet = planets[i];
+			i = planetc;
+		}
+	}
+
+	if (planet != NULL) {
+		planet->name = name;
+		planet->pos = pos;
+		planet->dof = dof;
+		planet->mass = mass;
+		planet->size = size;
+
+		emit planetsMoved();
+	} else {
+		emit errorOccured("Error occured...");
 	}
 }
 
@@ -99,6 +148,24 @@ void SolarSystem::resetPlanets() {
 	}
 
 	emit planetsMoved();
+}
+
+void SolarSystem::setSelectedPlanet(Planet *planet) {
+	*selectedPlanet = *planet;
+	emit selectionChanged();
+}
+
+Planet* SolarSystem::getSelectedPlanet() {
+	return selectedPlanet;
+}
+
+bool SolarSystem::planetExists(string name) {
+	for (int i = 0; i < planetc; i++) {
+		if (!planets[i]->name.compare(name))
+			return true;
+	}
+
+	return false;
 }
 
 void SolarSystem::calcGravity(Planet *planet) {

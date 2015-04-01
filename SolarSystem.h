@@ -27,29 +27,38 @@ public:
 	~SolarSystem();
 
 	mpf_class getG();
+	void setG(double);
 
 	int getPlanetc();
 	Planet* getPlanet(int);
+	void setSelectedPlanet(Planet*);
+	Planet* getSelectedPlanet();
 
 	int getFrameCount();
 	int getProgBarValue();
 
-	void setBtnState(bool);
-	bool getBtnState();
+	void setCtrlState(bool);
+	bool getCtrlState();
 
 	void tick();
 	void addPlanet(string, Vector, Vector, string, string);
+	void addPlanet(QString, QString, QString, QString, QString, QString, QString);
+	void editPlanet(string, Vector, Vector, string, string);
+	void editPlanet(QString, QString, QString, QString, QString, QString, QString);
+
+	bool planetExists(string);
 	
 private:
 	mpf_class G_CONST;
 
 	int planetc;
 	Planet *planets[MAX_PLANETS];
+	Planet *selectedPlanet;
 	
 	int frameCount;
 	int progBarValue;
 
-	bool btnsEnabled;
+	bool ctrlsEnabled;
 
 	void calcGravity(Planet*);
 
@@ -59,17 +68,18 @@ public slots:
 	void resetProgBar(int);
 	void updateProgBar(int);
 
-	void enableBtns();
+	void enableCtrls();
 
 signals:
 	void errorOccured(QString);
 
-	void btnStateChanged();
+	void ctrlStateChanged();
 
 	void progBarChanged();
 
 	void planetsMoved();
 	void planetAdded();
+	void selectionChanged();
 
 };
 

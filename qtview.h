@@ -7,6 +7,7 @@
 #include <QGraphicsView>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QApplication>
 #include <QtGui>
 #include <QWidget>
@@ -16,11 +17,13 @@
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QProgressBar>
+#include <QLineEdit>
 
 #include <iostream>
 #include <string.h>
 
 #include "SolarSystem.h"
+#include "Planet.h"
 
 using namespace std;
 
@@ -33,20 +36,19 @@ public:
 	QGraphicsScene *scene;
 	QTimeLine *timer;
 
-	QPushButton *qBtnAdd;
-	QPushButton *qBtnEdit;
-	QPushButton *qBtnDelete;
-	QPushButton *qBtnReset;
-	QPushButton *qBtnRun;
+	QPushButton *qBtnAdd, *qBtnEdit, *qBtnDelete, *qBtnReset, *qBtnRun, *qBtnSetG;
+	QLineEdit *qTxtName, *qTxtPosX, *qTxtPosY, *qTxtDofX, *qTxtDofY, *qTxtMass, *qTxtSize;
 
 	QtView(SolarSystem*);
 	~QtView();
 
 	void simulate(int);
+	QGraphicsEllipseItem* getEllipse(int);
 
 private:
 	SolarSystem *model;
-	
+
+	QGraphicsView *graphicsView;	
 	QGraphicsEllipseItem *ellipse[MAX_PLANETS];
 	QGraphicsItemAnimation *anims[MAX_PLANETS];
 
@@ -61,7 +63,9 @@ public slots:
 	void updateView();
 	void updateProgBar();
 
-	void updateBtns();
+	void updateCtrls();
+
+	void updateSelection();
 
 signals:
 	void errorOccured(QString);
