@@ -6,9 +6,9 @@ Vector::Vector() {
 
 }
 
-Vector::Vector(string x, string y) {
-	this->x = mpf_class(x, MPF_SIZE);
-	this->y = mpf_class(y, MPF_SIZE);
+Vector::Vector(string s_x, string s_y) {
+	this->x = mpf_class(s_x, MPF_SIZE);
+	this->y = mpf_class(s_y, MPF_SIZE);
 }
 
 Vector::Vector(mpf_class x, mpf_class y) {

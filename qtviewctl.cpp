@@ -19,10 +19,12 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(view->qBtnDelete, SIGNAL(clicked()), this, SLOT(delPlanet()));
 	connect(view->qBtnSetG, SIGNAL(clicked()), this, SLOT(setG()));
 	connect(view->timer, SIGNAL(finished()), model, SLOT(enableCtrls()));
+	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
 	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(updateProgBar(int)));
 	connect(view->scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
 
-	connect(model, SIGNAL(planetAdded()), view, SLOT(addEllipse()));
+	connect(model, SIGNAL(planetAdded(int)), view, SLOT(addEllipse(int)));
+	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(delEllipse(int)));
 	connect(model, SIGNAL(planetsMoved()), view, SLOT(updateView()));
 	connect(model, SIGNAL(progBarChanged()), view, SLOT(updateProgBar()));
 	connect(model, SIGNAL(ctrlStateChanged()), view, SLOT(updateCtrls()));
@@ -63,6 +65,7 @@ void QtViewCtl::addPlanet() {
 			QMessageBox::warning(this, "Error", "Planet already exists", QMessageBox::Ok);
 		} else {
 			model->addPlanet(name, posx, posy, dofx, dofy, mass, size);
+			QMessageBox::warning(this, "Error", "asdf", QMessageBox::Ok);
 		}
 	}
 }
@@ -89,7 +92,8 @@ void QtViewCtl::editPlanet() {
 }
 
 void QtViewCtl::delPlanet() {
-	
+	int id = getSelectedPlanet();
+	model->deletePlanet(id);
 }
 
 void QtViewCtl::resetPlanets() {
@@ -102,19 +106,20 @@ void QtViewCtl::resetPlanets() {
 }
 
 void QtViewCtl::selectionChanged() {
-	Planet *selectedPlanet = getSelectedPlanet();
-	model->setSelectedPlanet(selectedPlanet);
+	model->setSelectedPlanetID(getSelectedPlanet());
 }
 
-Planet* QtViewCtl::getSelectedPlanet() {
+int QtViewCtl::getSelectedPlanet() {
 	if (!view->scene->selectedItems().isEmpty()) {
 		QGraphicsItem *focused = view->scene->selectedItems().first();
 
-		for (int i = 0; i < model->getPlanetc(); i++) {
-			QGraphicsItem *ellipse = view->getEllipse(i);
+		for (int i = 0; i < MAX_PLANETS; i++) {
+			if (model->getPlanet(i) != NULL) {
+				QGraphicsItem *ellipse = view->getEllipse(i);
 
-			if (focused == ellipse)
-				return model->getPlanet(i);
+				if (focused == ellipse)
+					return i;
+			}
 		}
 	}
 }

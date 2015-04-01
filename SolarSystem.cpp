@@ -8,15 +8,16 @@ SolarSystem::SolarSystem() : QWidget() {
 	// struct Planet *earth = init_planet("earth", "149597870000.0", "0", "0", "29780.0", "5972190000000000000000000.0", "6371000");
 	// struct Planet *mars = init_planet("mars", "227939100000.0", "0", "0", "24077.0", "641693000000000000000000.0", "6792000");
 
-	selectedPlanet = new Planet("Name", Vector("0", "0"), Vector("0", "0"), "0", "0");
+	selectedPlanetID = -1;
+
+	for (int i = 0; i < MAX_PLANETS; i++)
+		planets[i] = NULL;
 
 	planets[0] = new Planet("sun\0", Vector("0", "0"), Vector("0", "0"), "1000000", "100");
 	planets[1] = new Planet("earth\0", Vector("50.0", "0"), Vector("0", "10"), "10000", "20");
 	planets[2] = new Planet("mars\0", Vector("100", "0"), Vector("0", "20"), "10000", "40");
 
 	G_CONST = "0.0001";
-
-	planetc = 3;
 
 	frameCount = 0;
 	progBarValue = 0;
@@ -36,10 +37,6 @@ mpf_class SolarSystem::getG() {
 
 void SolarSystem::setG(double g) {
 	G_CONST = g;
-}
-
-int SolarSystem::getPlanetc() {
-	return planetc;
 }
 
 Planet* SolarSystem::getPlanet(int pos) {
@@ -93,15 +90,19 @@ void SolarSystem::addPlanet(QString name, QString posX, QString posY, QString do
 }
 
 void SolarSystem::addPlanet(string name, Vector pos, Vector dof, string mass, string size) {
-	if (planetc + 1 < 10) {
-		planets[planetc] = new Planet(name, pos, dof, mass, size);
-		planetc++;
-
-		emit planetAdded();
-
-	} else {
-		emit errorOccured("No more room for planets...");
+	int id = -1;
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] == NULL) {
+			planets[i] = new Planet(name, pos, dof, mass, size);
+			id = i;
+			i = MAX_PLANETS;
+		}
 	}
+
+	if (id >= 0)
+		emit planetAdded(id);
+	else
+		emit errorOccured("No more room for planets...");
 }
 
 void SolarSystem::editPlanet(QString name, QString posX, QString posY, QString dofX, QString dofY, QString mass, QString size) {
@@ -119,11 +120,9 @@ void SolarSystem::editPlanet(QString name, QString posX, QString posY, QString d
 void SolarSystem::editPlanet(string name, Vector pos, Vector dof, string mass, string size) {
 	Planet *planet = NULL;
 
-	for (int i = 0; i < planetc; i++) {
-		if (!planets[i]->name.compare(name)) {
-			planet = planets[i];
-			i = planetc;
-		}
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] != NULL)
+			if (!planets[i]->name.compare(name)) planet = planets[i];
 	}
 
 	if (planet != NULL) {
@@ -135,34 +134,43 @@ void SolarSystem::editPlanet(string name, Vector pos, Vector dof, string mass, s
 
 		emit planetsMoved();
 	} else {
-		emit errorOccured("Error occured...");
+		emit errorOccured("Planet not found...");
 	}
 }
 
-void SolarSystem::resetPlanets() {
-	for (int i = 0; i < planetc; i++) {
-		Planet *p = planets[i];
+void SolarSystem::deletePlanet(int id) {
+	delete planets[id];
+	planets[id] = NULL;
 
-		p->pos = p->startPos;
-		p->dof = p->startDof;
+	emit planetDeleted(id);
+}
+
+void SolarSystem::resetPlanets() {
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] != NULL) {
+			Planet *p = planets[i];
+
+			p->pos = p->startPos;
+			p->dof = p->startDof;
+		}
 	}
 
 	emit planetsMoved();
 }
 
-void SolarSystem::setSelectedPlanet(Planet *planet) {
-	*selectedPlanet = *planet;
+void SolarSystem::setSelectedPlanetID(int id) {
+	selectedPlanetID = id;
 	emit selectionChanged();
 }
 
-Planet* SolarSystem::getSelectedPlanet() {
-	return selectedPlanet;
+int SolarSystem::getSelectedPlanetID() {
+	return selectedPlanetID;
 }
 
 bool SolarSystem::planetExists(string name) {
-	for (int i = 0; i < planetc; i++) {
-		if (!planets[i]->name.compare(name))
-			return true;
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] != NULL)
+			if (!planets[i]->name.compare(name)) return true;
 	}
 
 	return false;
@@ -178,46 +186,48 @@ void SolarSystem::calcGravity(Planet *planet) {
 	mpf_class t2 = mpf_class("0", 512);
 
 	Planet *object;
-	for (int i = 0; i < planetc; i++) {
-		object = planets[i];
-		if (planet->name.compare(object->name)) {
-			Rx = object->pos.x - planet->pos.x; 
-			Ry = object->pos.y - planet->pos.y;
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] != NULL) {
+			object = planets[i];
+			if (planet->name.compare(object->name)) {
+				Rx = object->pos.x - planet->pos.x; 
+				Ry = object->pos.y - planet->pos.y;
 
-			t1 = Rx * Rx;
-			t2 = Ry * Ry;
+				t1 = Rx * Rx;
+				t2 = Ry * Ry;
 
-			t1 += t2;
+				t1 += t2;
 
-			r = sqrt(t1);
+				r = sqrt(t1);
 
-			t1 = object->mass * planet->mass;
-			t1 = t1 / r;
+				t1 = object->mass * planet->mass;
+				t1 = t1 / r;
 
-			F = t1 * G_CONST;
+				F = t1 * G_CONST;
 
-			k = F / r;
+				k = F / r;
 
-			t1 = Rx * k;
-			t2 = Ry * k;
+				t1 = Rx * k;
+				t2 = Ry * k;
 
-			t1 = t1 / planet->mass;
-			t2 = t2 / planet->mass;
+				t1 = t1 / planet->mass;
+				t2 = t2 / planet->mass;
 
-			planet->dof.x += t1;
-			planet->dof.y += t2;
+				planet->dof.x += t1;
+				planet->dof.y += t2;
+			}
 		}
 	}
 }
 
 void SolarSystem::tick() {
-	for (int i = 0; i < planetc; i++)
-		this->calcGravity(planets[i]);
+	for (int i = 0; i < MAX_PLANETS; i++)
+		if (planets[i] != NULL) this->calcGravity(planets[i]);
 
-	for (int i = 0; i < planetc; i++) {
-		planets[i]->pos.x += planets[i]->dof.x;
-		planets[i]->pos.y += planets[i]->dof.y;
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] != NULL) {
+			planets[i]->pos.x += planets[i]->dof.x;
+			planets[i]->pos.y += planets[i]->dof.y;
+		}
 	}
-
-	//emit planetsMoved();
 }

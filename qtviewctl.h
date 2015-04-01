@@ -35,7 +35,7 @@ private:
     SolarSystem *model;
     QtView *view;
 
-    Planet* getSelectedPlanet();
+    int getSelectedPlanet();
 
 public slots:
 	void displayError(QString);

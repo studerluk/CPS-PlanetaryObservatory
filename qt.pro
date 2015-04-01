@@ -15,7 +15,6 @@ LIBS += -lgmp -lgmpxx
 
 SOURCES += main.cpp\
 		qtview.cpp \
-	main_2.cpp \
 	Planet.cpp \
 	SolarSystem.cpp \
     qtviewctl.cpp \

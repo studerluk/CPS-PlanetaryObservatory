@@ -100,14 +100,19 @@ QtView::~QtView() {
 }
 
 void QtView::initPlanets() {
-	for (int i = 0; i < model->getPlanetc(); i++) {
-		double size = model->getPlanet(i)->size.get_d();
-		double posx = model->getPlanet(i)->pos.x.get_d();
-		double posy = model->getPlanet(i)->pos.y.get_d();
+	for (int i = 0; i < MAX_PLANETS; i++)
+		ellipse[i] = NULL;
 
-		ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
-			QPen(Qt::SolidLine), QBrush(Qt::red));
-		ellipse[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (model->getPlanet(i) != NULL) {
+			double size = model->getPlanet(i)->size.get_d();
+			double posx = model->getPlanet(i)->pos.x.get_d();
+			double posy = model->getPlanet(i)->pos.y.get_d();
+
+			ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
+				QPen(Qt::SolidLine), QBrush(Qt::red));
+			ellipse[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+		}
 	}
 
 	QGraphicsEllipseItem *test = scene->addEllipse(
@@ -118,10 +123,15 @@ void QtView::initPlanets() {
 void QtView::initAnimation() {
 	timer = new QTimeLine();
 
-	for (int i = 0; i < model->getPlanetc(); i++) {
-		anims[i] = new QGraphicsItemAnimation();
-		anims[i]->setItem(ellipse[i]);
-		anims[i]->setTimeLine(timer);
+	for (int i = 0; i < MAX_PLANETS; i++)
+		anims[i] = NULL;
+
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (model->getPlanet(i) != NULL) {
+			anims[i] = new QGraphicsItemAnimation();
+			anims[i]->setItem(ellipse[i]);
+			anims[i]->setTimeLine(timer);
+		}
 	}
 }
 
@@ -140,42 +150,51 @@ void QtView::simulate(int count) {
 	for (int i = 0; i < count; i++) {
 		model->tick();
 		model->updateProgBar(i);
-		for (int j = 0; j < model->getPlanetc(); j++) {
-			double size = model->getPlanet(j)->size.get_d();
-			double posx = model->getPlanet(j)->pos.x.get_d();
-			double posy = model->getPlanet(j)->pos.y.get_d();
+		for (int j = 0; j < MAX_PLANETS; j++) {
+			if (model->getPlanet(j) != NULL) {
+				double posx = model->getPlanet(j)->pos.x.get_d();
+				double posy = model->getPlanet(j)->pos.y.get_d();
 
-			double step = (double) i / count;
-			anims[j]->setPosAt(step, QPointF(posx, posy));
+				double step = (double) i / count;
+				anims[j]->setPosAt(step, QPointF(posx, posy));
+			}
 		}
 	}
 	timer->start();
 }
 
-void QtView::addEllipse() {
-	int i = model->getPlanetc() -1;
+void QtView::addEllipse(int id) {
+	double size = model->getPlanet(id)->size.get_d();
+	double posx = model->getPlanet(id)->pos.x.get_d();
+	double posy = model->getPlanet(id)->pos.y.get_d();
 
-	double size = model->getPlanet(i)->size.get_d();
-	double posx = model->getPlanet(i)->pos.x.get_d();
-	double posy = model->getPlanet(i)->pos.y.get_d();
-
-	ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
+	ellipse[id] = scene->addEllipse(QRectF(posx, posy, size, size),
 			QPen(Qt::SolidLine), QBrush(Qt::red));
-	ellipse[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	ellipse[id]->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-	anims[i] = new QGraphicsItemAnimation();
-	anims[i]->setItem(ellipse[i]);
-	anims[i]->setTimeLine(timer);
+	anims[id] = new QGraphicsItemAnimation();
+	anims[id]->setItem(ellipse[id]);
+	anims[id]->setTimeLine(timer);
 
 	this->updateView();
 }
 
-void QtView::updateView() {
-	for (int i = 0; i < model->getPlanetc(); i++) {
-		double posx = model->getPlanet(i)->pos.x.get_d();
-		double posy = model->getPlanet(i)->pos.y.get_d();
+void QtView::delEllipse(int id) {
+	delete ellipse[id];
+	ellipse[id] = NULL;
 
-		ellipse[i]->setPos(QPointF(posx, posy));
+	delete anims[id];
+	ellipse[id] = NULL;
+}
+
+void QtView::updateView() {
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (model->getPlanet(i) != NULL) {
+			double posx = model->getPlanet(i)->pos.x.get_d();
+			double posy = model->getPlanet(i)->pos.y.get_d();
+
+			ellipse[i]->setPos(QPointF(posx, posy));
+		}
 	}
 }
 
@@ -207,15 +226,18 @@ void QtView::updateProgBar() {
 }
 
 void QtView::updateSelection() {
-	Planet *planet = model->getSelectedPlanet();
+	int id = model->getSelectedPlanetID();
+	if (id >= 0) {
+		Planet *planet = model->getPlanet(id);
 
-	qTxtName->setText(QString::fromStdString(planet->name));
-	qTxtPosX->setText(QString::number(planet->pos.x.get_d(), 'f', 3));
-	qTxtPosY->setText(QString::number(planet->pos.y.get_d(), 'f', 3));
-	qTxtDofX->setText(QString::number(planet->dof.x.get_d(), 'f', 3));
-	qTxtDofY->setText(QString::number(planet->dof.y.get_d(), 'f', 3));
-	qTxtMass->setText(QString::number(planet->mass.get_d(), 'f', 3));
-	qTxtSize->setText(QString::number(planet->size.get_d(), 'f', 3));
+		qTxtName->setText(QString::fromStdString(planet->name));
+		qTxtPosX->setText(QString::number(planet->pos.x.get_d(), 'f', 3));
+		qTxtPosY->setText(QString::number(planet->pos.y.get_d(), 'f', 3));
+		qTxtDofX->setText(QString::number(planet->dof.x.get_d(), 'f', 3));
+		qTxtDofY->setText(QString::number(planet->dof.y.get_d(), 'f', 3));
+		qTxtMass->setText(QString::number(planet->mass.get_d(), 'f', 3));
+		qTxtSize->setText(QString::number(planet->size.get_d(), 'f', 3));
+	}	
 }
 
 QGraphicsEllipseItem* QtView::getEllipse(int i) {

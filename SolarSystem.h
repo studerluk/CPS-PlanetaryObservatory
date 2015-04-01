@@ -29,10 +29,11 @@ public:
 	mpf_class getG();
 	void setG(double);
 
-	int getPlanetc();
 	Planet* getPlanet(int);
 	void setSelectedPlanet(Planet*);
 	Planet* getSelectedPlanet();
+	void setSelectedPlanetID(int);
+	int getSelectedPlanetID();
 
 	int getFrameCount();
 	int getProgBarValue();
@@ -45,15 +46,15 @@ public:
 	void addPlanet(QString, QString, QString, QString, QString, QString, QString);
 	void editPlanet(string, Vector, Vector, string, string);
 	void editPlanet(QString, QString, QString, QString, QString, QString, QString);
+	void deletePlanet(int);
 
 	bool planetExists(string);
 	
 private:
 	mpf_class G_CONST;
 
-	int planetc;
 	Planet *planets[MAX_PLANETS];
-	Planet *selectedPlanet;
+	int selectedPlanetID;
 	
 	int frameCount;
 	int progBarValue;
@@ -78,7 +79,8 @@ signals:
 	void progBarChanged();
 
 	void planetsMoved();
-	void planetAdded();
+	void planetAdded(int);
+	void planetDeleted(int);
 	void selectionChanged();
 
 };

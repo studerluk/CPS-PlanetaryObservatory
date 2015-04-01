@@ -58,7 +58,8 @@ private:
 	void initAnimation();
 	
 public slots:
-	void addEllipse();
+	void addEllipse(int);
+	void delEllipse(int);
 
 	void updateView();
 	void updateProgBar();
