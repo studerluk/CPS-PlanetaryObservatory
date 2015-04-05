@@ -11,7 +11,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 	// graphics
 	scene = new QGraphicsScene(-100, -100, 1000, 800);
-	scene->setBackgroundBrush(Qt::white);
+	scene->setBackgroundBrush(Qt::black);
 
 	graphicsView = new QGraphicsView(scene);
 	graphicsView->setRenderHints(QPainter::Antialiasing);
@@ -35,27 +35,21 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 	qTxtPosX = new QLineEdit();
 	qTxtPosX->setPlaceholderText("Position X");
-	qTxtPosX->setValidator(new QDoubleValidator(0, 500, 3, this));
 
 	qTxtPosY = new QLineEdit();
 	qTxtPosY->setPlaceholderText("Position Y");
-	qTxtPosY->setValidator(new QDoubleValidator(0, 500, 3, this));
 
 	qTxtDofX = new QLineEdit();
 	qTxtDofX->setPlaceholderText("Dof X");
-	qTxtDofX->setValidator(new QDoubleValidator(0, 500, 3, this));
 
 	qTxtDofY = new QLineEdit();
 	qTxtDofY->setPlaceholderText("Dof Y");
-	qTxtDofY->setValidator(new QDoubleValidator(0, 500, 3, this));
 
 	qTxtMass = new QLineEdit();
 	qTxtMass->setPlaceholderText("Mass");
-	qTxtMass->setValidator(new QDoubleValidator(0, 1000000, 3, this));
 
 	qTxtSize = new QLineEdit();
 	qTxtSize->setPlaceholderText("Size");
-	qTxtSize->setValidator(new QDoubleValidator(0, 200, 3, this));
 
 	progBar = new QProgressBar(this);
 	progBar->setMinimum(0);
@@ -66,7 +60,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 	qCBoxColor = new QComboBox(this);
 	qCBoxColor->setInsertPolicy(QComboBox::NoInsert);
 	QStringList colors;
-	colors << "Red" << "Dark Red" << "Green" << "Dark Green" << "Blue" << "Dark Blue"
+	colors << "White" << "Red" << "Dark Red" << "Green" << "Dark Green" << "Blue" << "Dark Blue"
 			<< "Cyan" << "Dark Cyan" << "Magenta" << "Dark Magenta" << "Yellow" << "Dark Yellow";
 	qCBoxColor->addItems(colors);
 
@@ -111,73 +105,56 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 		anims[i] = NULL;
 	}
 		
-	for (int i = 0; i < MAX_PLANETS; i++) {
-		Planet *planet = model->getPlanet(i);
-		if (planet != NULL) {
-			double size = planet->size.get_d();
-			double posx = planet->pos.x.get_d();
-			double posy = planet->pos.y.get_d();
-
-			ellipse[i] = scene->addEllipse(QRectF(posx, posy, size, size),
-				QPen(Qt::SolidLine), getBrush(planet->color));
-			ellipse[i]->setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-			anims[i] = new QGraphicsItemAnimation();
-			anims[i]->setItem(ellipse[i]);
-			anims[i]->setTimeLine(timer);
-		}
-	}
-
 	QGraphicsEllipseItem *test = scene->addEllipse(
-			QRectF(0, 0, 2, 2),
-			QPen(Qt::SolidLine), QBrush(Qt::black));
+			QRectF(0, 0, 3, 3),
+			QPen(Qt::SolidLine), QBrush(Qt::white));
+
+	updateView();
 }
 
 QtView::~QtView() {
 
 }
 
-QBrush QtView::getBrush(string color) {
-	QBrush brush = QBrush();
-
-	if (!color.compare("Red"))
-		brush.setColor(Qt::red);
+QColor QtView::translateColor(string color) {
+	if (!color.compare("White"))
+		return Qt::white;
+	else if (!color.compare("Red"))
+		return Qt::red;
 	else if (!color.compare("Dark Red"))
-		brush.setColor(Qt::darkRed);
+		return Qt::darkRed;
 	else if (!color.compare("Green"))
-		brush.setColor(Qt::green);
+		return Qt::green;
 	else if (!color.compare("Dark Green"))
-		brush.setColor(Qt::darkGreen);
+		return Qt::darkGreen;
 	else if (!color.compare("Blue"))
-		brush.setColor(Qt::blue);
+		return Qt::blue;
 	else if (!color.compare("Dark Blue"))
-		brush.setColor(Qt::darkBlue);
+		return Qt::darkBlue;
 	else if (!color.compare("Cyan"))
-		brush.setColor(Qt::cyan);
+		return Qt::cyan;
 	else if (!color.compare("Dark Cyan"))
-		brush.setColor(Qt::darkCyan);
+		return Qt::darkCyan;
 	else if (!color.compare("Magenta"))
-		brush.setColor(Qt::magenta);
+		return Qt::magenta;
 	else if (!color.compare("Dark Magenta"))
-		brush.setColor(Qt::darkMagenta);
+		return Qt::darkMagenta;
 	else if (!color.compare("Yellow"))
-		brush.setColor(Qt::yellow);
+		return Qt::yellow;
 	else if (!color.compare("Dark Yellow"))
-		brush.setColor(Qt::darkYellow);
-	else
-		brush.setColor(Qt::red);
-
-	return brush;
+		return Qt::darkYellow;
 }
 
 void QtView::addEllipse(int id) {
-	double size = model->getPlanet(id)->size.get_d();
-	double posx = model->getPlanet(id)->pos.x.get_d();
-	double posy = model->getPlanet(id)->pos.y.get_d();
+	Planet *planet = model->getPlanet(id);
+	double size = planet->size.get_d();
+	double posx = planet->pos.x.get_d() - (planet->size.get_d() / 2);
+	double posy = planet->pos.y.get_d() - (planet->size.get_d() / 2);
 
 	ellipse[id] = scene->addEllipse(QRectF(posx, posy, size, size),
-			QPen(Qt::SolidLine), QBrush(Qt::red));
+			QPen(Qt::SolidLine), QBrush(Qt::white));
 	ellipse[id]->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	ellipse[id]->setBrush(translateColor(planet->color));
 
 	anims[id] = new QGraphicsItemAnimation();
 	anims[id]->setItem(ellipse[id]);
@@ -208,9 +185,10 @@ void QtView::animate(int count) {
 		model->tick();
 		model->updateProgBar(i);
 		for (int j = 0; j < MAX_PLANETS; j++) {
-			if (model->getPlanet(j) != NULL) {
-				double posx = model->getPlanet(j)->pos.x.get_d();
-				double posy = model->getPlanet(j)->pos.y.get_d();
+			Planet *planet = model->getPlanet(j);
+			if (planet != NULL) {
+				double posx = planet->pos.x.get_d();
+				double posy = planet->pos.y.get_d();
 
 				double step = (double) i / count;
 				anims[j]->setPosAt(step, QPointF(posx, posy));
@@ -222,11 +200,17 @@ void QtView::animate(int count) {
 
 void QtView::updateView() {
 	for (int i = 0; i < MAX_PLANETS; i++) {
-		if (model->getPlanet(i) != NULL) {
-			double posx = model->getPlanet(i)->pos.x.get_d();
-			double posy = model->getPlanet(i)->pos.y.get_d();
+		Planet *planet = model->getPlanet(i);
+		if (planet != NULL) {
+			double posx = planet->pos.x.get_d();
+			double posy = planet->pos.y.get_d();
 
-			ellipse[i]->setPos(QPointF(posx, posy));
+			if (ellipse[i] != NULL) {
+				ellipse[i]->setPos(QPointF(posx, posy));
+				ellipse[i]->setBrush(translateColor(planet->color));
+			} else {
+				addEllipse(i);
+			}
 		}
 	}
 }
@@ -273,6 +257,15 @@ void QtView::updateAnimInfo() {
 		int i = qCBoxColor->findText(QString::fromStdString(planet->color));
 		if (i >= 0)
 			qCBoxColor->setCurrentIndex(i);
+	} else {
+		qTxtName->setText("");
+		qTxtPosX->setText("");
+		qTxtPosY->setText("");
+		qTxtDofX->setText("");
+		qTxtDofY->setText("");
+		qTxtMass->setText("");
+		qTxtSize->setText("");
+		qCBoxColor->setCurrentIndex(0);
 	}
 }
 

@@ -56,7 +56,7 @@ private:
 
 	QProgressBar *progBar;
 
-	QBrush getBrush(string);
+	QColor translateColor(string);
 
 public slots:
 	void addEllipse(int);

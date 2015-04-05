@@ -13,8 +13,8 @@ SolarSystem::SolarSystem() : QWidget() {
 	for (int i = 0; i < MAX_PLANETS; i++)
 		planets[i] = NULL;
 
-	planets[0] = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100", "Red");
-	planets[1] = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20", "Red");
+	planets[0] = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100", "Yellow");
+	planets[1] = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20", "Blue");
 	planets[2] = new Planet("mars\0", "100", "0", "0", "20", "10000", "40", "Red");
 
 	G_CONST = "0.0001";
@@ -73,6 +73,15 @@ void SolarSystem::resetProgBar(int timerDuration) {
 void SolarSystem::updateProgBar(int frameNr) {
 	progBarValue = frameNr;
 	emit progBarChanged();
+}
+
+void SolarSystem::updatePlanetColor(QString color) {
+	if (selectedPlanetID >= 0) {
+		Planet *planet = planets[selectedPlanetID];
+		planet->color = color.toStdString();
+
+		emit planetsMoved();
+	}
 }
 
 void SolarSystem::addPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size, string color) {

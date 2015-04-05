@@ -66,6 +66,7 @@ public slots:
 
 	void resetProgBar(int);
 	void updateProgBar(int);
+	void updatePlanetColor(QString);
 
 	void enableCtrls();
 

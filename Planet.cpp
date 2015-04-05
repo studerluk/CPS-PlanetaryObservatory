@@ -20,6 +20,8 @@ Planet::Planet(string name, string posx, string posy, string dofx, string dofy, 
 	this->startPos = pos;
 	this->startDof = dof;
 
+	this->color = color;
+
 	cout << this->name << " initialized\n";
 }
 
@@ -34,6 +36,8 @@ Planet::Planet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class si
 
 	this->startPos = pos;
 	this->startDof = dof;
+
+	this->color = color;
 
 	cout << this->name << " initialized\n";
 }

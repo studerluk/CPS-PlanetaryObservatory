@@ -19,10 +19,12 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(view->qBtnDelete, SIGNAL(clicked()), this, SLOT(delPlanet()));
 	connect(view->qBtnSetG, SIGNAL(clicked()), this, SLOT(setG()));
 	connect(view->scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
+	connect(view->qCBoxColor, SIGNAL(currentTextChanged(QString)), model, SLOT(updatePlanetColor(QString)));
 
 	connect(view->timer, SIGNAL(finished()), model, SLOT(enableCtrls()));
-	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
+	// connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
 	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(updateProgBar(int)));
+	connect(view->timer, SIGNAL(frameChanged(int)), view, SLOT(updateAnimInfo()));
 
 	connect(model, SIGNAL(planetAdded(int)), view, SLOT(addEllipse(int)));
 	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(delEllipse(int)));
