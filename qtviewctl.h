@@ -46,10 +46,6 @@ public slots:
 	void delPlanet();
 	void setG();
 
-	void resetPlanets();
-
-	void selectionChanged();
-
 };
 
 #endif // QTVIEWCTL_H

@@ -9,13 +9,14 @@ SolarSystem::SolarSystem() : QWidget() {
 	// struct Planet *mars = init_planet("mars", "227939100000.0", "0", "0", "24077.0", "641693000000000000000000.0", "6792000");
 
 	selectedPlanetID = -1;
+	currentPlanet = Planet("None", "0", "0", "0", "0", "0", "0", "White");
 
 	for (int i = 0; i < MAX_PLANETS; i++)
 		planets[i] = NULL;
 
-	planets[0] = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100", "Yellow");
-	planets[1] = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20", "Blue");
-	planets[2] = new Planet("mars\0", "100", "0", "0", "20", "10000", "40", "Red");
+	planets[0] = new Planet("Sun", "0", "0", "0", "0", "1000000", "100", "Yellow");
+	planets[1] = new Planet("Earth", "50.0", "0", "0", "10", "10000", "20", "Blue");
+	planets[2] = new Planet("Mars", "100", "0", "0", "20", "10000", "40", "Red");
 
 	G_CONST = "0.0001";
 
@@ -39,8 +40,11 @@ void SolarSystem::setG(double g) {
 	G_CONST = g;
 }
 
-Planet* SolarSystem::getPlanet(int pos) {
-	return planets[pos];
+Planet* SolarSystem::getPlanet(int id) {
+	// currentPlanet = *planets[id];
+	// return &currentPlanet;
+
+	return planets[id];
 }
 
 void SolarSystem::enableCtrls() {
@@ -70,7 +74,7 @@ void SolarSystem::resetProgBar(int timerDuration) {
 	emit progBarChanged();
 }
 
-void SolarSystem::updateProgBar(int frameNr) {
+void SolarSystem::setProgBarValue(int frameNr) {
 	progBarValue = frameNr;
 	emit progBarChanged();
 }
@@ -80,7 +84,7 @@ void SolarSystem::updatePlanetColor(QString color) {
 		Planet *planet = planets[selectedPlanetID];
 		planet->color = color.toStdString();
 
-		emit planetsMoved();
+		emit planetChanged(selectedPlanetID);
 	}
 }
 
@@ -101,14 +105,8 @@ void SolarSystem::addPlanet(string name, Vector pos, Vector dof, mpf_class mass,
 }
 
 void SolarSystem::editPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size, string color) {
-	Planet *planet = NULL;
-
-	for (int i = 0; i < MAX_PLANETS; i++) {
-		if (planets[i] != NULL)
-			if (!planets[i]->name.compare(name)) planet = planets[i];
-	}
-
-	if (planet != NULL) {
+	if (selectedPlanetID >= 0) {
+		Planet *planet = planets[selectedPlanetID];
 		planet->name = name;
 		planet->pos = pos;
 		planet->dof = dof;
@@ -116,9 +114,9 @@ void SolarSystem::editPlanet(string name, Vector pos, Vector dof, mpf_class mass
 		planet->size = size;
 		planet->color = color;
 
-		emit planetsMoved();
+		emit planetChanged(selectedPlanetID);
 	} else {
-		emit errorOccured("Planet not found...");
+		emit errorOccured("No planet selected");
 	}
 }
 
@@ -139,7 +137,7 @@ void SolarSystem::resetPlanets() {
 		}
 	}
 
-	emit planetsMoved();
+	emit planetsReset();
 }
 
 void SolarSystem::setSelectedPlanetID(int id) {
@@ -158,6 +156,18 @@ bool SolarSystem::planetExists(string name) {
 	}
 
 	return false;
+}
+
+void SolarSystem::tick() {
+	for (int i = 0; i < MAX_PLANETS; i++)
+		if (planets[i] != NULL) this->calcGravity(planets[i]);
+
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (planets[i] != NULL) {
+			planets[i]->pos.x += planets[i]->dof.x;
+			planets[i]->pos.y += planets[i]->dof.y;
+		}
+	}
 }
 
 void SolarSystem::calcGravity(Planet *planet) {
@@ -200,18 +210,6 @@ void SolarSystem::calcGravity(Planet *planet) {
 				planet->dof.x += t1;
 				planet->dof.y += t2;
 			}
-		}
-	}
-}
-
-void SolarSystem::tick() {
-	for (int i = 0; i < MAX_PLANETS; i++)
-		if (planets[i] != NULL) this->calcGravity(planets[i]);
-
-	for (int i = 0; i < MAX_PLANETS; i++) {
-		if (planets[i] != NULL) {
-			planets[i]->pos.x += planets[i]->dof.x;
-			planets[i]->pos.y += planets[i]->dof.y;
 		}
 	}
 }

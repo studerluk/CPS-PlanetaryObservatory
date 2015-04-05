@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
 	QtView *gui = new QtView(milky);
 	QtViewCtl *ctl = new QtViewCtl(milky, gui);
 
-	// // QtView *gui2 = new QtView(milky);
-	// // QtViewCtl *ctl2 = new QtViewCtl(milky, gui2);
+	// QtView *gui2 = new QtView(milky);
+	// QtViewCtl *ctl2 = new QtViewCtl(milky, gui2);
 
 	gui->show();
 	// gui2->show();

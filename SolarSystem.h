@@ -26,12 +26,12 @@ public:
 	SolarSystem();
 	~SolarSystem();
 
-	mpf_class getG();
 	void setG(double);
+	mpf_class getG();
+
+	Planet currentPlanet;
 
 	Planet* getPlanet(int);
-	void setSelectedPlanet(Planet*);
-	Planet* getSelectedPlanet();
 	void setSelectedPlanetID(int);
 	int getSelectedPlanetID();
 
@@ -63,10 +63,10 @@ private:
 
 public slots:
 	void resetPlanets();
+	void updatePlanetColor(QString);
 
 	void resetProgBar(int);
-	void updateProgBar(int);
-	void updatePlanetColor(QString);
+	void setProgBarValue(int);
 
 	void enableCtrls();
 
@@ -74,12 +74,12 @@ signals:
 	void errorOccured(QString);
 
 	void ctrlStateChanged();
-
 	void progBarChanged();
 
-	void planetsMoved();
 	void planetAdded(int);
 	void planetDeleted(int);
+	void planetChanged(int);
+	void planetsReset();
 	void selectionChanged();
 
 };

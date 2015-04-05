@@ -23,8 +23,8 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 	qBtnAdd = new QPushButton("Add");
 	qBtnEdit = new QPushButton("Edit");
 	qBtnDelete = new QPushButton("Delete");
-	qBtnReset = new QPushButton("Reset");
 	qBtnRun = new QPushButton("Run");
+	qBtnReset = new QPushButton("Reset");
 	qBtnSetG = new QPushButton("Set G");
 
 
@@ -104,7 +104,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 		ellipse[i] = NULL;
 		anims[i] = NULL;
 	}
-		
+
 	QGraphicsEllipseItem *test = scene->addEllipse(
 			QRectF(0, 0, 3, 3),
 			QPen(Qt::SolidLine), QBrush(Qt::white));
@@ -114,35 +114,6 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 
 QtView::~QtView() {
 
-}
-
-QColor QtView::translateColor(string color) {
-	if (!color.compare("White"))
-		return Qt::white;
-	else if (!color.compare("Red"))
-		return Qt::red;
-	else if (!color.compare("Dark Red"))
-		return Qt::darkRed;
-	else if (!color.compare("Green"))
-		return Qt::green;
-	else if (!color.compare("Dark Green"))
-		return Qt::darkGreen;
-	else if (!color.compare("Blue"))
-		return Qt::blue;
-	else if (!color.compare("Dark Blue"))
-		return Qt::darkBlue;
-	else if (!color.compare("Cyan"))
-		return Qt::cyan;
-	else if (!color.compare("Dark Cyan"))
-		return Qt::darkCyan;
-	else if (!color.compare("Magenta"))
-		return Qt::magenta;
-	else if (!color.compare("Dark Magenta"))
-		return Qt::darkMagenta;
-	else if (!color.compare("Yellow"))
-		return Qt::yellow;
-	else if (!color.compare("Dark Yellow"))
-		return Qt::darkYellow;
 }
 
 void QtView::addEllipse(int id) {
@@ -183,7 +154,7 @@ void QtView::animate(int count) {
 
 	for (int i = 0; i < count; i++) {
 		model->tick();
-		model->updateProgBar(i);
+		model->setProgBarValue(i);
 		for (int j = 0; j < MAX_PLANETS; j++) {
 			Planet *planet = model->getPlanet(j);
 			if (planet != NULL) {
@@ -201,16 +172,15 @@ void QtView::animate(int count) {
 void QtView::updateView() {
 	for (int i = 0; i < MAX_PLANETS; i++) {
 		Planet *planet = model->getPlanet(i);
-		if (planet != NULL) {
-			double posx = planet->pos.x.get_d();
-			double posy = planet->pos.y.get_d();
+		QGraphicsEllipseItem *graph = ellipse[i];
 
-			if (ellipse[i] != NULL) {
-				ellipse[i]->setPos(QPointF(posx, posy));
-				ellipse[i]->setBrush(translateColor(planet->color));
-			} else {
-				addEllipse(i);
-			}
+		if (planet != NULL && graph != NULL) {
+			ellipse[i]->setPos(QPointF(planet->pos.x.get_d(), planet->pos.y.get_d()));
+			ellipse[i]->setBrush(translateColor(planet->color));
+		} else if (planet != NULL && graph == NULL) {
+			addEllipse(i);
+		} else if (planet == NULL && graph != NULL) {
+			delEllipse(i);
 		}
 	}
 }
@@ -269,6 +239,49 @@ void QtView::updateAnimInfo() {
 	}
 }
 
-QGraphicsEllipseItem* QtView::getEllipse(int i) {
-	return ellipse[i];
+void QtView::updateSelection() {
+	if (!scene->selectedItems().isEmpty()) {
+		QGraphicsItem *focused = scene->selectedItems().first();
+
+		for (int i = 0; i < MAX_PLANETS; i++) {
+			if (model->getPlanet(i) != NULL) {
+				if (focused == ellipse[i]) {
+					model->setSelectedPlanetID(i);
+					i = MAX_PLANETS;
+				}
+			}
+		}
+
+	} else {
+		model->setSelectedPlanetID(-1);
+	}
+}
+
+QColor QtView::translateColor(string color) {
+	if (!color.compare("White"))
+		return Qt::white;
+	else if (!color.compare("Red"))
+		return Qt::red;
+	else if (!color.compare("Dark Red"))
+		return Qt::darkRed;
+	else if (!color.compare("Green"))
+		return Qt::green;
+	else if (!color.compare("Dark Green"))
+		return Qt::darkGreen;
+	else if (!color.compare("Blue"))
+		return Qt::blue;
+	else if (!color.compare("Dark Blue"))
+		return Qt::darkBlue;
+	else if (!color.compare("Cyan"))
+		return Qt::cyan;
+	else if (!color.compare("Dark Cyan"))
+		return Qt::darkCyan;
+	else if (!color.compare("Magenta"))
+		return Qt::magenta;
+	else if (!color.compare("Dark Magenta"))
+		return Qt::darkMagenta;
+	else if (!color.compare("Yellow"))
+		return Qt::yellow;
+	else if (!color.compare("Dark Yellow"))
+		return Qt::darkYellow;
 }

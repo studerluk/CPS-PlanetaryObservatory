@@ -45,7 +45,6 @@ public:
 	~QtView();
 
 	void animate(int);
-	QGraphicsEllipseItem* getEllipse(int);
 
 private:
 	SolarSystem *model;
@@ -65,6 +64,7 @@ public slots:
 	void updateView();
 	void updateAnimInfo();
 	void updateCtrls();
+	void updateSelection();
 
 signals:
 	void errorOccured(QString);

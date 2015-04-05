@@ -13,28 +13,30 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(view, SIGNAL(errorOccured(QString)), this, SLOT(displayError(QString)));
 
 	connect(view->qBtnRun, SIGNAL(clicked()), this, SLOT(run()));
-	connect(view->qBtnReset, SIGNAL(clicked()), this, SLOT(resetPlanets()));
 	connect(view->qBtnAdd, SIGNAL(clicked()), this, SLOT(addPlanet()));
 	connect(view->qBtnEdit, SIGNAL(clicked()), this, SLOT(editPlanet()));
 	connect(view->qBtnDelete, SIGNAL(clicked()), this, SLOT(delPlanet()));
 	connect(view->qBtnSetG, SIGNAL(clicked()), this, SLOT(setG()));
-	connect(view->scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
+	connect(view->scene, SIGNAL(selectionChanged()), view, SLOT(updateSelection()));
 	connect(view->qCBoxColor, SIGNAL(currentTextChanged(QString)), model, SLOT(updatePlanetColor(QString)));
 
+	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(resetPlanets()));
+	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(enableCtrls()));
+	connect(view->qBtnReset, SIGNAL(clicked()), view->timer, SLOT(stop()));
+
 	connect(view->timer, SIGNAL(finished()), model, SLOT(enableCtrls()));
-	// connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
-	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(updateProgBar(int)));
+	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
+	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(setProgBarValue(int)));
 	connect(view->timer, SIGNAL(frameChanged(int)), view, SLOT(updateAnimInfo()));
 
-	connect(model, SIGNAL(planetAdded(int)), view, SLOT(addEllipse(int)));
-	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(delEllipse(int)));
-	connect(model, SIGNAL(planetsMoved()), view, SLOT(updateView()));
+	connect(model, SIGNAL(planetAdded(int)), view, SLOT(updateView()));
+	connect(model, SIGNAL(planetChanged(int)), view, SLOT(updateView()));
+	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(updateView()));
+	connect(model, SIGNAL(planetsReset()), view, SLOT(updateView()));
+
 	connect(model, SIGNAL(progBarChanged()), view, SLOT(updateAnimInfo()));
 	connect(model, SIGNAL(ctrlStateChanged()), view, SLOT(updateCtrls()));
 	connect(model, SIGNAL(selectionChanged()), view, SLOT(updateAnimInfo()));
-	
-
-	view->installEventFilter(this);
 }
 
 QtViewCtl::~QtViewCtl() {
@@ -62,20 +64,38 @@ void QtViewCtl::addPlanet() {
 			model->addPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size, planet->color);
 			QMessageBox::information(this, "Success", "Planet updated", QMessageBox::Ok);
 		}
+
+		delete planet;
 	}
 }
 
 void QtViewCtl::editPlanet() {
-	Planet *planet = extractPlanet();
-	
-	if (planet != NULL) {
-		if (!model->planetExists(planet->name)) {
-			QMessageBox::warning(this, "Error", "Planet does not exists", QMessageBox::Ok);
-		} else {
+	int id = model->getSelectedPlanetID();
+	if (id >= 0) {
+		Planet *planet = extractPlanet();
+		if (planet != NULL) {
 			model->editPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size, planet->color);
-			QMessageBox::information(this, "Success", "Planet updated", QMessageBox::Ok);
+			delete planet;
 		}
+	} else {
+		QMessageBox::warning(this, "Error", "No planet selected", QMessageBox::Ok);
 	}
+}
+
+void QtViewCtl::delPlanet() {
+	int id = model->getSelectedPlanetID();
+
+	if (id >= 0)
+		model->deletePlanet(id);
+	else
+		QMessageBox::warning(this, "Error", "No planet selected", QMessageBox::Ok);
+}
+
+void QtViewCtl::setG() {
+	bool ok;
+	double g = QInputDialog::getDouble(this, "Set gravity constant", "Ticks:", model->getG().get_d(), 0.0000001, 1, 7, &ok);
+
+	if (ok) model->setG(g);
 }
 
 Planet* QtViewCtl::extractPlanet() {
@@ -97,42 +117,3 @@ Planet* QtViewCtl::extractPlanet() {
 	}
 }
 
-void QtViewCtl::delPlanet() {
-	int id = model->getSelectedPlanetID();
-	model->deletePlanet(id);
-}
-
-void QtViewCtl::resetPlanets() {
-	if (view->timer->state() == QTimeLine::Running)
-		view->timer->stop();
-
-	model->enableCtrls();
-	model->resetPlanets();
-	model->resetProgBar(100);
-}
-
-void QtViewCtl::selectionChanged() {
-	if (!view->scene->selectedItems().isEmpty()) {
-		QGraphicsItem *focused = view->scene->selectedItems().first();
-
-		for (int i = 0; i < MAX_PLANETS; i++) {
-			if (model->getPlanet(i) != NULL) {
-				QGraphicsItem *ellipse = view->getEllipse(i);
-
-				if (focused == ellipse) {
-					model->setSelectedPlanetID(i);
-					i = MAX_PLANETS;
-				}
-			}
-		}
-	} else {
-		model->setSelectedPlanetID(-1);
-	}
-}
-
-void QtViewCtl::setG() {
-	bool ok;
-	double g = QInputDialog::getDouble(this, "Set gravity constant", "Ticks:", model->getG().get_d(), 0.0000001, 1, 7, &ok);
-
-	if (ok) model->setG(g);
-}
