@@ -17,13 +17,14 @@ class Planet {
 
 public:
 	Planet();
-	Planet(string, string, string, string, string, string, string);
-	Planet(string, Vector, Vector, mpf_class, mpf_class);
+	Planet(string, string, string, string, string, string, string, string);
+	Planet(string, Vector, Vector, mpf_class, mpf_class, string);
 	~Planet();
 
 	string name;
 	mpf_class mass;
 	mpf_class size;
+	string color;
 
 	Vector startPos;
 	Vector startDof;

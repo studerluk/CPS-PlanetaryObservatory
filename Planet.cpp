@@ -8,7 +8,7 @@ Planet::Planet() {
 	
 }
 
-Planet::Planet(string name, string posx, string posy, string dofx, string dofy, string mass, string size) {
+Planet::Planet(string name, string posx, string posy, string dofx, string dofy, string mass, string size, string color) {
 
 	this->name = name;
 	this->pos = Vector(posx, posy);
@@ -23,7 +23,7 @@ Planet::Planet(string name, string posx, string posy, string dofx, string dofy, 
 	cout << this->name << " initialized\n";
 }
 
-Planet::Planet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size) {
+Planet::Planet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size, string color) {
 
 	this->name = name;
 	this->pos = pos;

@@ -57,7 +57,7 @@ void QtViewCtl::addPlanet() {
 		if (model->planetExists(planet->name)) {
 			QMessageBox::warning(this, "Error", "Planet already exists", QMessageBox::Ok);
 		} else {
-			model->addPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size);
+			model->addPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size, planet->color);
 			QMessageBox::information(this, "Success", "Planet updated", QMessageBox::Ok);
 		}
 	}
@@ -70,7 +70,7 @@ void QtViewCtl::editPlanet() {
 		if (!model->planetExists(planet->name)) {
 			QMessageBox::warning(this, "Error", "Planet does not exists", QMessageBox::Ok);
 		} else {
-			model->editPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size);
+			model->editPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size, planet->color);
 			QMessageBox::information(this, "Success", "Planet updated", QMessageBox::Ok);
 		}
 	}
@@ -84,13 +84,14 @@ Planet* QtViewCtl::extractPlanet() {
 	QString dofy = view->qTxtDofY->text();
 	QString mass = view->qTxtMass->text();
 	QString size = view->qTxtSize->text();
+	QString color = view->qCBoxColor->currentText();
 
 	if (name.isEmpty() || posx.isEmpty() || posy.isEmpty() || dofx.isEmpty() || dofy.isEmpty() || mass.isEmpty() || size.isEmpty()) {
 		QMessageBox::warning(this, "Error", "Every field has to fild out", QMessageBox::Ok);
 		return NULL;
 	} else {
 		return new Planet(name.toStdString(), posx.toStdString(), posy.toStdString(),
-				dofx.toStdString(), dofy.toStdString(), mass.toStdString(), size.toStdString());
+				dofx.toStdString(), dofy.toStdString(), mass.toStdString(), size.toStdString(), color.toStdString());
 	}
 }
 

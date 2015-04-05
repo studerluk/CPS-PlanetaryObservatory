@@ -42,8 +42,8 @@ public:
 	bool getCtrlState();
 
 	void tick();
-	void addPlanet(string, Vector, Vector, mpf_class, mpf_class);
-	void editPlanet(string, Vector, Vector, mpf_class, mpf_class);
+	void addPlanet(string, Vector, Vector, mpf_class, mpf_class, string);
+	void editPlanet(string, Vector, Vector, mpf_class, mpf_class, string);
 	void deletePlanet(int);
 
 	bool planetExists(string);

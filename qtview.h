@@ -18,6 +18,7 @@
 #include <QDockWidget>
 #include <QProgressBar>
 #include <QLineEdit>
+#include <QComboBox>
 
 #include <iostream>
 #include <string.h>
@@ -38,6 +39,7 @@ public:
 
 	QPushButton *qBtnAdd, *qBtnEdit, *qBtnDelete, *qBtnReset, *qBtnRun, *qBtnSetG;
 	QLineEdit *qTxtName, *qTxtPosX, *qTxtPosY, *qTxtDofX, *qTxtDofY, *qTxtMass, *qTxtSize;
+	QComboBox *qCBoxColor;
 
 	QtView(SolarSystem*);
 	~QtView();
@@ -53,6 +55,8 @@ private:
 	QGraphicsItemAnimation *anims[MAX_PLANETS];
 
 	QProgressBar *progBar;
+
+	QBrush getBrush(string);
 
 public slots:
 	void addEllipse(int);

@@ -13,9 +13,9 @@ SolarSystem::SolarSystem() : QWidget() {
 	for (int i = 0; i < MAX_PLANETS; i++)
 		planets[i] = NULL;
 
-	planets[0] = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100");
-	planets[1] = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20");
-	planets[2] = new Planet("mars\0", "100", "0", "0", "20", "10000", "40");
+	planets[0] = new Planet("sun\0", "0", "0", "0", "0", "1000000", "100", "Red");
+	planets[1] = new Planet("earth\0", "50.0", "0", "0", "10", "10000", "20", "Red");
+	planets[2] = new Planet("mars\0", "100", "0", "0", "20", "10000", "40", "Red");
 
 	G_CONST = "0.0001";
 
@@ -75,11 +75,11 @@ void SolarSystem::updateProgBar(int frameNr) {
 	emit progBarChanged();
 }
 
-void SolarSystem::addPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size) {
+void SolarSystem::addPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size, string color) {
 	int id = -1;
 	for (int i = 0; i < MAX_PLANETS; i++) {
 		if (planets[i] == NULL) {
-			planets[i] = new Planet(name, pos, dof, mass, size);
+			planets[i] = new Planet(name, pos, dof, mass, size, color);
 			id = i;
 			i = MAX_PLANETS;
 		}
@@ -91,7 +91,7 @@ void SolarSystem::addPlanet(string name, Vector pos, Vector dof, mpf_class mass,
 		emit errorOccured("No more room for planets...");
 }
 
-void SolarSystem::editPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size) {
+void SolarSystem::editPlanet(string name, Vector pos, Vector dof, mpf_class mass, mpf_class size, string color) {
 	Planet *planet = NULL;
 
 	for (int i = 0; i < MAX_PLANETS; i++) {
@@ -105,6 +105,7 @@ void SolarSystem::editPlanet(string name, Vector pos, Vector dof, mpf_class mass
 		planet->dof = dof;
 		planet->mass = mass;
 		planet->size = size;
+		planet->color = color;
 
 		emit planetsMoved();
 	} else {
