@@ -291,4 +291,6 @@ QColor QtView::translateColor(string color) {
 		return Qt::yellow;
 	else if (!color.compare("Dark Yellow"))
 		return Qt::darkYellow;
+
+	return Qt::white;
 }

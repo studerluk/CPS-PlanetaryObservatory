@@ -45,7 +45,11 @@ Planet* SolarSystem::getPlanet(int id) {
 	return planets[id];
 }
 
-void SolarSystem::setCtrlState(bool state=true) {
+void SolarSystem::enableControls() {
+	setCtrlState(true);
+}
+
+void SolarSystem::setCtrlState(bool state) {
 	ctrlsEnabled = state;
 	emit ctrlStateChanged();
 }

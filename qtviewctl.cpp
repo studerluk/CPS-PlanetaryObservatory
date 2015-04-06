@@ -21,11 +21,11 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(view->qCBoxColor, SIGNAL(currentTextChanged(QString)), model, SLOT(updatePlanetColor(QString)));
 
 	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(resetPlanets()));
-	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(enableCtrls()));
+	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(enableControls()));
 	connect(view->qBtnReset, SIGNAL(clicked()), view->timer, SLOT(stop()));
 	connect(model, SIGNAL(planetsReset()), view, SLOT(clearAnimations()));
 
-	connect(view->timer, SIGNAL(finished()), model, SLOT(enableCtrls()));
+	connect(view->timer, SIGNAL(finished()), model, SLOT(enableControls()));
 	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
 	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(setProgBarValue(int)));
 	connect(view->timer, SIGNAL(frameChanged(int)), view, SLOT(updatePlanetInfo()));

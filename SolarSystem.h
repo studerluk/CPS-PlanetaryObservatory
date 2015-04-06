@@ -37,6 +37,8 @@ public:
 
 	int getFrameCount();
 	int getProgBarValue();
+
+	void setCtrlState(bool);
 	bool getCtrlState();
 
 	void tick();
@@ -61,7 +63,7 @@ public slots:
 	void resetPlanets();
 	void updatePlanetColor(QString);
 
-	void setCtrlState(bool);
+	void enableControls();
 
 	void resetProgBar(int);
 	void setProgBarValue(int);
