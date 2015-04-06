@@ -23,20 +23,21 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(resetPlanets()));
 	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(enableCtrls()));
 	connect(view->qBtnReset, SIGNAL(clicked()), view->timer, SLOT(stop()));
+	connect(model, SIGNAL(planetsReset()), view, SLOT(clearAnimations()));
 
 	connect(view->timer, SIGNAL(finished()), model, SLOT(enableCtrls()));
 	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
 	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(setProgBarValue(int)));
-	connect(view->timer, SIGNAL(frameChanged(int)), view, SLOT(updateAnimInfo()));
+	connect(view->timer, SIGNAL(frameChanged(int)), view, SLOT(updatePlanetInfo()));
 
 	connect(model, SIGNAL(planetAdded(int)), view, SLOT(updateView()));
 	connect(model, SIGNAL(planetChanged(int)), view, SLOT(updateView()));
 	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(updateView()));
 	connect(model, SIGNAL(planetsReset()), view, SLOT(updateView()));
 
-	connect(model, SIGNAL(progBarChanged()), view, SLOT(updateAnimInfo()));
+	connect(model, SIGNAL(progBarChanged()), view, SLOT(updatePlanetInfo()));
 	connect(model, SIGNAL(ctrlStateChanged()), view, SLOT(updateCtrls()));
-	connect(model, SIGNAL(selectionChanged()), view, SLOT(updateAnimInfo()));
+	connect(model, SIGNAL(selectionChanged()), view, SLOT(updatePlanetInfo()));
 }
 
 QtViewCtl::~QtViewCtl() {
@@ -58,13 +59,8 @@ void QtViewCtl::addPlanet() {
 	Planet *planet = extractPlanet();
 
 	if (planet != NULL) {
-		if (model->planetExists(planet->name)) {
-			QMessageBox::warning(this, "Error", "Planet already exists", QMessageBox::Ok);
-		} else {
-			model->addPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size, planet->color);
-			QMessageBox::information(this, "Success", "Planet updated", QMessageBox::Ok);
-		}
-
+		model->addPlanet(planet->name, planet->pos, planet->dof, planet->mass, planet->size, planet->color);
+		QMessageBox::information(this, "Success", "Planet updated", QMessageBox::Ok);
 		delete planet;
 	}
 }

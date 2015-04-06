@@ -144,8 +144,8 @@ void QtView::animate(int count) {
 	model->setCtrlState(false);
 
 	int duration = 1000;
-	if (count *100 > 1000)
-		duration = count *100;
+	if (count *10 > 1000)
+		duration = count *10;
 
 	timer->setDuration(duration);
 	timer->setFrameRange(0, duration);
@@ -185,26 +185,14 @@ void QtView::updateView() {
 	}
 }
 
-void QtView::updateCtrls() {
-	bool state = model->getCtrlState();
-
-	qBtnAdd->setEnabled(state);
-	qBtnEdit->setEnabled(state);
-	qBtnDelete->setEnabled(state);
-	qBtnRun->setEnabled(state);
-	qBtnSetG->setEnabled(state);
-
-	qTxtName->setEnabled(state);
-	qTxtPosX->setEnabled(state);
-	qTxtPosY->setEnabled(state);
-	qTxtDofX->setEnabled(state);
-	qTxtDofY->setEnabled(state);
-	qTxtMass->setEnabled(state);
-	qTxtSize->setEnabled(state);
-	qCBoxColor->setEnabled(state);
+void QtView::clearAnimations() {
+	for (int i = 0; i < MAX_PLANETS; i++) {
+		if (ellipse[i] != NULL)
+			anims[i]->clear();
+	}
 }
 
-void QtView::updateAnimInfo() {
+void QtView::updatePlanetInfo() {
 	int frameCount = model->getFrameCount();
 
 	if (progBar->maximum() != frameCount)
@@ -237,6 +225,25 @@ void QtView::updateAnimInfo() {
 		qTxtSize->setText("");
 		qCBoxColor->setCurrentIndex(0);
 	}
+}
+
+void QtView::updateCtrls() {
+	bool state = model->getCtrlState();
+
+	qBtnAdd->setEnabled(state);
+	qBtnEdit->setEnabled(state);
+	qBtnDelete->setEnabled(state);
+	qBtnRun->setEnabled(state);
+	qBtnSetG->setEnabled(state);
+
+	qTxtName->setEnabled(state);
+	qTxtPosX->setEnabled(state);
+	qTxtPosY->setEnabled(state);
+	qTxtDofX->setEnabled(state);
+	qTxtDofY->setEnabled(state);
+	qTxtMass->setEnabled(state);
+	qTxtSize->setEnabled(state);
+	qCBoxColor->setEnabled(state);
 }
 
 void QtView::updateSelection() {

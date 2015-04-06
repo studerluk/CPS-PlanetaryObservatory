@@ -62,7 +62,8 @@ public slots:
 	void delEllipse(int);
 
 	void updateView();
-	void updateAnimInfo();
+	void clearAnimations();
+	void updatePlanetInfo();
 	void updateCtrls();
 	void updateSelection();
 

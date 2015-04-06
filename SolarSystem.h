@@ -37,16 +37,12 @@ public:
 
 	int getFrameCount();
 	int getProgBarValue();
-
-	void setCtrlState(bool);
 	bool getCtrlState();
 
 	void tick();
 	void addPlanet(string, Vector, Vector, mpf_class, mpf_class, string);
 	void editPlanet(string, Vector, Vector, mpf_class, mpf_class, string);
 	void deletePlanet(int);
-
-	bool planetExists(string);
 	
 private:
 	mpf_class G_CONST;
@@ -65,10 +61,10 @@ public slots:
 	void resetPlanets();
 	void updatePlanetColor(QString);
 
+	void setCtrlState(bool);
+
 	void resetProgBar(int);
 	void setProgBarValue(int);
-
-	void enableCtrls();
 
 signals:
 	void errorOccured(QString);

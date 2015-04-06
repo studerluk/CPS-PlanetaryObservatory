@@ -15,7 +15,7 @@ SolarSystem::SolarSystem() : QWidget() {
 		planets[i] = NULL;
 
 	planets[0] = new Planet("Sun", "0", "0", "0", "0", "1000000", "100", "Yellow");
-	planets[1] = new Planet("Earth", "50.0", "0", "0", "10", "10000", "20", "Blue");
+	planets[1] = new Planet("Earth", "50", "0", "0", "10", "10000", "20", "Blue");
 	planets[2] = new Planet("Mars", "100", "0", "0", "20", "10000", "40", "Red");
 
 	G_CONST = "0.0001";
@@ -24,8 +24,6 @@ SolarSystem::SolarSystem() : QWidget() {
 	progBarValue = 0;
 
 	ctrlsEnabled = true;
-
-	puts("SolarSystem populated\n");
 }
 
 SolarSystem::~SolarSystem() {
@@ -47,11 +45,7 @@ Planet* SolarSystem::getPlanet(int id) {
 	return planets[id];
 }
 
-void SolarSystem::enableCtrls() {
-	this->setCtrlState(true);
-}
-
-void SolarSystem::setCtrlState(bool state) {
+void SolarSystem::setCtrlState(bool state=true) {
 	ctrlsEnabled = state;
 	emit ctrlStateChanged();
 }
@@ -147,15 +141,6 @@ void SolarSystem::setSelectedPlanetID(int id) {
 
 int SolarSystem::getSelectedPlanetID() {
 	return selectedPlanetID;
-}
-
-bool SolarSystem::planetExists(string name) {
-	for (int i = 0; i < MAX_PLANETS; i++) {
-		if (planets[i] != NULL)
-			if (!planets[i]->name.compare(name)) return true;
-	}
-
-	return false;
 }
 
 void SolarSystem::tick() {
