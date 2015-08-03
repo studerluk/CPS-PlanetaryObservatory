@@ -12,31 +12,35 @@ QtViewCtl::QtViewCtl(SolarSystem *solarSystem, QtView *gui) : QWidget() {
 	connect(model, SIGNAL(errorOccured(QString)), this, SLOT(displayError(QString)));
 	connect(view, SIGNAL(errorOccured(QString)), this, SLOT(displayError(QString)));
 
-	connect(view->qBtnRun, SIGNAL(clicked()), this, SLOT(run()));
 	connect(view->qBtnAdd, SIGNAL(clicked()), this, SLOT(addPlanet()));
+	connect(model, SIGNAL(planetAdded(int)), view, SLOT(updateView()));
+
 	connect(view->qBtnEdit, SIGNAL(clicked()), this, SLOT(editPlanet()));
+	connect(view->qCBoxColor, SIGNAL(currentTextChanged(QString)), model, SLOT(updatePlanetColor(QString)));
+	connect(model, SIGNAL(planetChanged(int)), view, SLOT(updateView()));
+
 	connect(view->qBtnDelete, SIGNAL(clicked()), this, SLOT(delPlanet()));
+	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(updateView()));
+
 	connect(view->qBtnSetG, SIGNAL(clicked()), this, SLOT(setG()));
 	connect(view->scene, SIGNAL(selectionChanged()), view, SLOT(updateSelection()));
-	connect(view->qCBoxColor, SIGNAL(currentTextChanged(QString)), model, SLOT(updatePlanetColor(QString)));
 
-	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(resetPlanets()));
-	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(enableControls()));
-	connect(view->qBtnReset, SIGNAL(clicked()), view->timer, SLOT(stop()));
-	connect(model, SIGNAL(planetsReset()), view, SLOT(clearAnimations()));
-
-	connect(view->timer, SIGNAL(finished()), model, SLOT(enableControls()));
-	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView()));
+	connect(view->qBtnRun, SIGNAL(clicked()), this, SLOT(run()));
 	connect(view->timer, SIGNAL(frameChanged(int)), model, SLOT(setProgBarValue(int)));
 	connect(view->timer, SIGNAL(frameChanged(int)), view, SLOT(updatePlanetInfo()));
+	connect(model, SIGNAL(progBarChanged()), view, SLOT(updatePlanetInfo()));	
 
-	connect(model, SIGNAL(planetAdded(int)), view, SLOT(updateView()));
-	connect(model, SIGNAL(planetChanged(int)), view, SLOT(updateView()));
-	connect(model, SIGNAL(planetDeleted(int)), view, SLOT(updateView()));
-	connect(model, SIGNAL(planetsReset()), view, SLOT(updateView()));
-
-	connect(model, SIGNAL(progBarChanged()), view, SLOT(updatePlanetInfo()));
+	connect(view->timer, SIGNAL(finished()), view, SLOT(updateView())); // Why does this shinanigance not work?!
+	connect(view->timer, SIGNAL(finished()), model, SLOT(enableControls()));
 	connect(model, SIGNAL(ctrlStateChanged()), view, SLOT(updateCtrls()));
+
+	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(enableControls()));
+	connect(view->qBtnReset, SIGNAL(clicked()), model, SLOT(resetPlanets()));
+	connect(view->qBtnReset, SIGNAL(clicked()), view->timer, SLOT(stop()));
+	connect(model, SIGNAL(planetsReset()), view, SLOT(clearAnimations()));
+	connect(model, SIGNAL(planetsReset()), view, SLOT(updateView()));
+	connect(model, SIGNAL(planetsReset()), view, SLOT(updatePlanetInfo()));
+
 	connect(model, SIGNAL(selectionChanged()), view, SLOT(updatePlanetInfo()));
 }
 

@@ -14,9 +14,9 @@ SolarSystem::SolarSystem() : QWidget() {
 	for (int i = 0; i < MAX_PLANETS; i++)
 		planets[i] = NULL;
 
-	planets[0] = new Planet("Sun", "0", "0", "0", "0", "1000000", "100", "Yellow");
-	planets[1] = new Planet("Earth", "50", "0", "0", "10", "10000", "20", "Blue");
-	planets[2] = new Planet("Mars", "100", "0", "0", "20", "10000", "40", "Red");
+	planets[0] = new Planet("Star", "0", "0", "0", "0", "1000000", "100", "Yellow");
+	planets[1] = new Planet("Satelite", "50", "0", "0", "10", "10000", "20", "Blue");
+	planets[2] = new Planet("Planet", "100", "0", "0", "20", "10000", "40", "Red");
 
 	G_CONST = "0.0001";
 
@@ -38,6 +38,7 @@ void SolarSystem::setG(double g) {
 	G_CONST = g;
 }
 
+// Fix this: pointer to privat object - seriously?!
 Planet* SolarSystem::getPlanet(int id) {
 	// currentPlanet = *planets[id];
 	// return &currentPlanet;
