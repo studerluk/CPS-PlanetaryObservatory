@@ -17,6 +17,7 @@ SolarSystem::SolarSystem() : QWidget() {
 	planets[0] = new Planet("Star", "0", "0", "0", "0", "1000000", "100", "Yellow");
 	planets[1] = new Planet("Satelite", "50", "0", "0", "10", "10000", "20", "Blue");
 	planets[2] = new Planet("Planet", "100", "0", "0", "20", "10000", "40", "Red");
+	planets[3] = new Planet("Planet2", "300", "0", "0", "5", "1000", "30", "Red");
 
 	G_CONST = "0.0001";
 

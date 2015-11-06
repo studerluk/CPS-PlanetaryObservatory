@@ -13,6 +13,7 @@ QtView::QtView(SolarSystem *solarSystem): QMainWindow() {
 	scene = new QGraphicsScene(-100, -100, 1000, 800);
 	scene->setBackgroundBrush(Qt::black);
 
+
 	graphicsView = new QGraphicsView(scene);
 	graphicsView->setRenderHints(QPainter::Antialiasing);
 	graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);

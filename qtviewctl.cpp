@@ -54,7 +54,7 @@ void QtViewCtl::displayError(QString errMsg) {
 
 void QtViewCtl::run() {
 	bool ok;
-	int i = (int) QInputDialog::getDouble(this, "Amoutn of ticks", "Ticks:", 100, 1, 100000, 0, &ok);
+	int i = (int) QInputDialog::getDouble(this, "Amoutn of ticks", "Ticks:", 1000, 1, 100000, 0, &ok);
 
 	if (ok) view->animate(i);
 }

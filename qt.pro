@@ -11,7 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qt
 TEMPLATE = app
 
-LIBS += -lgmp -lgmpxx
+INCLUDEPATH += /usr/local/include
+
+LIBS +=
 
 SOURCES += main.cpp\
 		qtview.cpp \
