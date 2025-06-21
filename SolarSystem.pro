@@ -17,17 +17,17 @@ LIBS += -L/usr/local/lib
 LIBS += -lgmp -lgmpxx
 
 
-SOURCES += main.cpp\
-	Planet.cpp \
-	SolarSystem.cpp \
-	Vector.cpp \
-	qtview.cpp \
-	qtviewctl.cpp
+SOURCES += src/main.cpp\
+        src/Planet.cpp \
+	src/SolarSystem.cpp \
+	src/Vector.cpp \
+	src/qtview.cpp \
+	src/qtviewctl.cpp
 
-HEADERS  += Planet.h \
-	SolarSystem.h \
-	Vector.h \
-	qtview.h \
-	qtviewctl.h
+HEADERS  += src/Planet.h \
+        src/SolarSystem.h \
+	src/Vector.h \
+	src/qtview.h \
+	src/qtviewctl.h
 
 FORMS    +=
